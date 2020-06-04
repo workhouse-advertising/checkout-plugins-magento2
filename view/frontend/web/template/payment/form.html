@@ -1,0 +1,41 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label data-bind="attr: {'for': getCode()}" class="label">
+            <span>
+               Interest Free by &nbsp;
+            </span>
+            <img 
+                src="https://dvh1deh6tagwk.cloudfront.net/niche-builder/5d5de04c57373.png" 
+                class="payment-icon" 
+                alt="Lmerchant" 
+                style="margin-left: 10px;" 
+                height="60" />
+        </label>
+    </div>
+
+    <div class="payment-method-content">
+        <div class="instalment-footer" style="background: #f0f0f0; padding: 10px 20px;">
+            <p>You will be redirected to Lmerchant to complete your purchase securely</p>
+            <p>Click on “Complete order” to continue</p>
+            <br>
+            <button 
+                class="action primary checkout" 
+                type="submit" 
+                data-bind="click: completeOrder, enable: (getCode() == isChecked())"
+                disabled
+            >
+                Complete order
+            </button>
+        </div>
+    </div>
+</div>
