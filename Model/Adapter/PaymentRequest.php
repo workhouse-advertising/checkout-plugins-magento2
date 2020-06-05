@@ -4,9 +4,10 @@ namespace Lmerchant\Checkout\Model\Adapter;
 use \Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
 use \Magento\Catalog\Api\ProductRepositoryInterface as ProductRepositoryInterface;
 use \Magento\Framework\Json\Helper\Data as JsonHelper;
-
 use \Magento\Directory\Model\CountryFactory as CountryFactory;
 use \Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfig;
+
+use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
 
 /**
  * Class PaymentRequest
@@ -19,6 +20,7 @@ class PaymentRequest
     protected $_jsonHelper;
     protected $_countryFactory;
     protected $_scopeConfig;
+    protected $_lmerchantHelper;
 
     /**
      * PaymentRequest constructor.
@@ -33,13 +35,15 @@ class PaymentRequest
         ProductRepositoryInterface $productRepositoryInterface,
         JsonHelper $jsonHelper,
         CountryFactory $countryFactory,
-        ScopeConfig $scopeConfig
+        ScopeConfig $scopeConfig,
+        LmerchantHelper $lmerchantHelper
     ) {
         $this->_storeManagerInterface = $storeManagerInterface;
         $this->_productRepositoryInterface = $productRepositoryInterface;
         $this->_jsonHelper = $jsonHelper;
         $this->_countryFactory = $countryFactory;
         $this->_scopeConfig = $scopeConfig;
+        $this->_lmerchantHelper = $lmerchantHelper;
     }
 
     /**
@@ -160,6 +164,11 @@ class PaymentRequest
 
         $taxAmount = array_key_exists('tax_amount', $additionalData) ? $additionalData['tax_amount'] : $shippingAddress->getTaxAmount();
         $paymentRequest['tax_amount'] = isset($taxAmount) ? round((float)$taxAmount, $precision) : 0;
+
+        $paymentGatewayConfig = $lmerchantHelper->getConfig();
+
+        $paymentRequest['merchant_id'] = $paymentGatewayConfig['merchantId'];
+        $paymentRequest['test'] = $paymentGatewayConfig['isSandboxMode'];
 
         return $paymentRequest;
     }
