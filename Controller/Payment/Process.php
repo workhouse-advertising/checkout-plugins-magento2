@@ -77,7 +77,7 @@ class Process extends \Magento\Framework\App\Action\Action
 
     public function _processAuthorizeCapture()
     {
-        $API_BASE_URL = 'merchant-api.lmerchant.com'; //TODO: get from config based on sandbox mode
+        $BASE_URL = 'merchant-api.lmerchant.com'; //TODO: get from config based on sandbox mode
 
         $data = $this->_checkoutSession->getData();
         $quote = $this->_checkoutSession->getQuote();
@@ -183,7 +183,7 @@ class Process extends \Magento\Framework\App\Action\Action
         $this->_checkoutSession->replaceQuote($quote);
         
         $paymentRequest['success'] = true;
-        $paymentRequest['url'] = 'https://' . $API_BASE_URL . '/magento/order';
+        $paymentRequest['url'] = 'https://' . $BASE_URL . '/purchase';
 
         $result = $this->_jsonResultFactory->create()->setData($paymentRequest);
 
