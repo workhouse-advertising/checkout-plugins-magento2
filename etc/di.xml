@@ -6,5 +6,25 @@
  */
 -->
 
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<config 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd"
+    >
+    <type name="Lmerchant\Checkout\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">Lmerchant</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Lmerchant\Checkout\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+	<preference 
+        for="Lmerchant\Checkout\Api\QuoteInterface" 
+        type="Lmerchant\Checkout\Model\Quote\Quote"/>
+    <preference 
+        for="Lmerchant\Checkout\Api\Data\QuoteRequestInterface" 
+        type="Lmerchant\Checkout\Model\Quote\QuoteRequest"/>
+    <preference 
+        for="Lmerchant\Checkout\Api\Data\QuoteResponseInterface" 
+        type="Lmerchant\Checkout\Model\Quote\QuoteResponse"/>
 </config>

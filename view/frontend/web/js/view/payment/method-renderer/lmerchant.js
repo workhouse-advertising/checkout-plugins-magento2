@@ -6,11 +6,12 @@
 /*global define*/
 define([
   "jquery",
+  "Magento_Checkout/js/model/quote",
   "Magento_Checkout/js/view/payment/default",
   "mage/url",
   "Magento_Ui/js/model/messageList",
   "Magento_Customer/js/customer-data",
-], function ($, Component, mageUrl, globalMessageList, customerData) {
+], function ($, quote, Component, mageUrl, globalMessageList, customerData) {
   "use strict";
 
   return Component.extend({
@@ -50,7 +51,6 @@ define([
     },
 
     completeOrder: function () {
-      console.log("completeOrder");
       var url = mageUrl.build("lmerchant/payment/process");
       var data = $("#co-shipping-form").serialize();
       var email = window.checkoutConfig.customerData.email;
@@ -61,7 +61,7 @@ define([
         email = document.getElementById("customer-email").value;
       }
 
-      data = data + "&email=" + email;
+      data = data + "&cartId=" + quote.getQuoteId() + "&email=" + email;
 
       $.ajax({
         url: url,
@@ -72,9 +72,6 @@ define([
         },
       })
         .done(function (response) {
-          console.log("response from lmerchant/payment/process");
-          console.log({ response });
-
           var data = response;
 
           var redirectToPortal = function (paymentRequest) {
@@ -85,8 +82,12 @@ define([
             form.style.display = "none";
 
             Object.keys(paymentRequest).forEach((key) => {
+              if (key === "url" || key === "success") {
+                return;
+              }
+
               var elem = document.createElement("input");
-              elem.name = `x_${key}`;
+              elem.name = key;
               elem.value = paymentRequest[key];
               form.appendChild(elem);
             });
@@ -103,12 +104,10 @@ define([
           ) {
             $("body").ajaxStop(function () {
               ajaxRedirected = true;
-              console.log("redirect to portal here..");
               redirectToPortal(data);
             });
             setTimeout(function () {
               if (!ajaxRedirected) {
-                console.log("redirect to portal here..");
                 redirectToPortal(data);
               }
             }, 5000);

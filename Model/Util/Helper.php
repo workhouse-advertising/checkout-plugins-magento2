@@ -1,10 +1,10 @@
 <?php
 namespace Lmerchant\Checkout\Model\Util;
 
-use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
-use Magento\Framework\App\State as State;
-use Magento\Framework\App\Request\Http as Request;
-use Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
+use \Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
+use \Magento\Framework\App\State as State;
+use \Magento\Framework\App\Request\Http as Request;
+use \Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
 
 /**
  * Class Helper
@@ -47,24 +47,48 @@ class Helper
 
     public function getConfig()
     {
-        $config['isActive'] = $this->_readConfig(self::ACTIVE);
+        $config['isActive'] = boolval($this->_readConfig(self::ACTIVE));
         $config['merchantId'] = $this->_readConfig(self::MERCHANT_ID);
-        $config['merchantSecret'] = $this->_readConfig(self::MERCHANT_SECRET);
-        $config['isSandboxMode'] = $this->_readConfig(self::SANDBOX_MODE);
+        $config['isSandboxMode'] = boolval($this->_readConfig(self::SANDBOX_MODE));
 
         return $config;
     }
 
-    protected function _readConfig($path)
+    public function getHMAC($payload)
+    {
+        if (!is_array($payload)) {
+            return '';
+        }
+
+        $secret = $this->_readConfig(self::MERCHANT_SECRET, true);
+
+        if (!isset($secret)) {
+            return "";
+        }
+
+        ksort($payload);
+
+        $message = "";
+
+        foreach ($payload as $key => $value) {
+            $message .= $key . $value;
+        }
+
+        return hash_hmac("sha256", $message, $secret);
+    }
+
+    private function _readConfig($path, $returnRaw = false)
     {
         $websiteId = $this->getWebsiteId();
-        $rootNode = 'payment/' . \Lmerchant\Checkout\Mode\Payment::METHOD_CODE;
+        $rootNode = 'payment/' . \Lmerchant\Checkout\Model\Payment::METHOD_CODE;
     
         if (!empty($websiteId) && $websiteId) {
-            return $this->_clean($this->scopeConfig->getValue($rootNode . '/' . $path, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES, $websiteId));
+            $val = $this->scopeConfig->getValue($rootNode . '/' . $path, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES, $websiteId);
         } else {
-            return $this->_clean($this->scopeConfig->getValue($rootNode . '/' . $path, 'default'));
+            $val = $this->scopeConfig->getValue($rootNode . '/' . $path, 'default');
         }
+
+        return $returnRaw ? $val : $this->_clean($val);
     }
     
     private function _clean($string)
