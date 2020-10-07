@@ -18,13 +18,8 @@
             </argument>
         </arguments>
     </type>
-	<preference 
-        for="Lmerchant\Checkout\Api\QuoteInterface" 
-        type="Lmerchant\Checkout\Model\Quote\Quote"/>
     <preference 
-        for="Lmerchant\Checkout\Api\Data\QuoteRequestInterface" 
-        type="Lmerchant\Checkout\Model\Quote\QuoteRequest"/>
-    <preference 
-        for="Lmerchant\Checkout\Api\Data\QuoteResponseInterface" 
-        type="Lmerchant\Checkout\Model\Quote\QuoteResponse"/>
+        for="Lmerchant\Checkout\Api\CallbackInterface" 
+        type="Lmerchant\Checkout\Api\Callback" 
+        />
 </config>

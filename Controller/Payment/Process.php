@@ -10,6 +10,7 @@ use \Magento\Quote\Model\QuoteValidator as QuoteValidator;
 
 use \Lmerchant\Checkout\Model\Adapter\PaymentRequest as PaymentRequestAdapter;
 use \Lmerchant\Checkout\Logger\Logger;
+use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 
 /**
  * Class Process
@@ -61,9 +62,10 @@ class Process extends \Magento\Framework\App\Action\Action
 
     public function _processCapture()
     {
-        $this->_logger->info(__METHOD__. " Processing capture");
+        $this->_logger->debug(__METHOD__. " Processing capture");
         
-        $BASE_URL = 'api.dev.latitudefinancial.com/v1/applybuy-checkout-service'; //TODO: get from config based on sandbox mode
+        //TODO: get from config based on test mode
+        $BASE_URL = 'api.dev.latitudefinancial.com/v1/applybuy-checkout-service'; 
 
         $post = $this->getRequest()->getPostValue();
         $cartId = htmlspecialchars($post['cartId'], ENT_QUOTES);
@@ -84,10 +86,10 @@ class Process extends \Magento\Framework\App\Action\Action
         $customerRepository = $objectManager->get('Magento\Customer\Api\CustomerRepositoryInterface');
 
         if ($customerSession->isLoggedIn()) {
-            $this->_logger->info(__METHOD__. " Customer checkout");
+            $this->_logger->debug(__METHOD__. " Customer checkout");
             $quoteId = $quote->getId();
 
-            $this->_logger->info(__METHOD__. " cartId:{$cartId}  quoteId:{$quoteId}");
+            $this->_logger->debug(__METHOD__. " cartId:{$cartId}  quoteId:{$quoteId}");
 
             $customerId = $customerSession->getCustomer()->getId();
             $customer = $customerRepository->getById($customerId);
@@ -131,15 +133,15 @@ class Process extends \Magento\Framework\App\Action\Action
                 $billingAddress->addData(array('address_type'=>'billing'));
             }
         } else {
-            $this->_logger->info(__METHOD__. " Guest checkout");
+            $this->_logger->debug(__METHOD__. " Guest checkout");
 
             $quoteIdMask = $this->_quoteIdMaskFactory->create()->load($cartId, 'masked_id');
             $quoteId = $quoteIdMask->getQuoteId();
 
-            $this->_logger->info(__METHOD__. " cartId:{$cartId}  quoteId:{$quoteId}");
+            $this->_logger->debug(__METHOD__. " cartId:{$cartId}  quoteId:{$quoteId}");
 
             $quote = $this->_cartRepository->get($quoteId);
-            $quote->setCheckoutMethod(\Lmerchant\Checkout\Model\Util\Constants::METHOD_GUEST);
+            $quote->setCheckoutMethod(LmerchantConstants::METHOD_GUEST);
 
             if (!empty($post['email'])) {
                 $email = htmlspecialchars($post['email'], ENT_QUOTES);
@@ -161,7 +163,7 @@ class Process extends \Magento\Framework\App\Action\Action
 
         $quote->reserveOrderId();
 
-        $quote->getPayment()->setMethod(\Lmerchant\Checkout\Model\Util\Constants::METHOD_CODE);
+        $quote->getPayment()->setMethod(LmerchantConstants::METHOD_CODE);
 
         try {
             $this->_quoteValidator->validateBeforeSubmit($quote);

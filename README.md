@@ -48,6 +48,6 @@ Demo checkout module for Magneto 2
 
 1. Click on Enabled checkbox
 
-1. Enable Sandbox mode for testing
+1. Enable Test mode for testing
 
 1. Save the configuration

@@ -4,8 +4,8 @@ namespace Lmerchant\Checkout\Model\Adapter;
 use \Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
 use \Magento\Catalog\Api\ProductRepositoryInterface as ProductRepositoryInterface;
 
-use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
+use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 
 /**
  * Class PaymentRequest
@@ -153,8 +153,9 @@ class PaymentRequest
 
         $paymentGatewayConfig =  $this->_lmerchantHelper->getConfig();
 
-        $paymentRequest['x_merchant_id'] = $paymentGatewayConfig['merchantId'];
-        $paymentRequest['x_test'] = $paymentGatewayConfig['isSandboxMode'] ? "true" : "false";
+        $paymentRequest['x_merchant_id'] = $paymentGatewayConfig[LmerchantHelper::MERCHANT_ID];
+        $paymentRequest['x_test'] = $paymentGatewayConfig[LmerchantHelper::TEST_MODE] ? "true" : "false";
+
         $paymentRequest['x_signature'] = $this->_lmerchantHelper->getHMAC($paymentRequest);
 
         return $paymentRequest;

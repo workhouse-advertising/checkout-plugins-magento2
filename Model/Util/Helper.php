@@ -15,7 +15,7 @@ class Helper
     const ACTIVE = 'active';
     const MERCHANT_ID = 'merchant_id';
     const MERCHANT_SECRET = 'merchant_secret';
-    const SANDBOX_MODE = 'sandbox_mode';
+    const TEST_MODE = 'test_mode';
 
     protected $scopeConfig;
     protected $state;
@@ -47,9 +47,9 @@ class Helper
 
     public function getConfig()
     {
-        $config['isActive'] = boolval($this->_readConfig(self::ACTIVE));
-        $config['merchantId'] = $this->_readConfig(self::MERCHANT_ID);
-        $config['isSandboxMode'] = boolval($this->_readConfig(self::SANDBOX_MODE));
+        $config[self::ACTIVE] = boolval($this->_readConfig(self::ACTIVE));
+        $config[self::MERCHANT_ID] = $this->_readConfig(self::MERCHANT_ID);
+        $config[self::TEST_MODE] = boolval($this->_readConfig(self::TEST_MODE));
 
         return $config;
     }

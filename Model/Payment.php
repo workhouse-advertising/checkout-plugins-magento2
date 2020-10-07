@@ -1,6 +1,8 @@
 <?php
 namespace Lmerchant\Checkout\Model;
 
+use Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
+
 class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 {
     const METHOD_CODE = 'lmerchant';
@@ -27,9 +29,9 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $this->logger = $objectManager->get("\Lmerchant\Checkout\Logger\Logger");
-        $this->logger->info(__METHOD__ . " Amount: {$amount}");
+        $this->logger->info(__METHOD__ . " Begin capture for amount: {$amount}");
         $this->_createTransaction($payment, $amount);
-        $this->logger->info(__METHOD__ . " Transaction created");
+        $this->logger->debug(__METHOD__ . " Transaction capture completed");
         return $this;
     }
 
@@ -37,8 +39,9 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $this->logger = $objectManager->get("\Lmerchant\Checkout\Logger\Logger");
-        $this->logger->info(__METHOD__ . " Amount: {$amount}");
-        $this->logger->info(__METHOD__ . " Send request to lmerchant refund endpoint: /refund.");
+        $this->logger->info(__METHOD__ .
+            " Begin refund for Amount: {$amount}".
+            " Sending request to lmerchant refund endpoint: /refund.");
         return $this;
     }
 
@@ -57,7 +60,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
         $info = $payment->getAdditionalInformation();
 
-        $transactionId = $info[\Lmerchant\Checkout\Model\Util\Constants::GATEWAY_REFERENCE];
+        $transactionId = $info[LmerchantConstants::GATEWAY_REFERENCE];
 
         $payment->setTransactionId($transactionId);
         $payment->setIsTransactionClosed(true);

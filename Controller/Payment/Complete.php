@@ -37,7 +37,7 @@ class Complete extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-        $this->_logger->info(__METHOD__. " Begin");
+        $this->_logger->debug(__METHOD__. " Begin");
         
         $quoteId = $this->getRequest()->getParam('reference');
 
@@ -45,12 +45,12 @@ class Complete extends \Magento\Framework\App\Action\Action
         $orderId = $quote->getReservedOrderId();
 
         if (empty($quoteId) || empty($orderId)) {
-            $this->_logger->info(__METHOD__. " Redirecting to cart");
-            $this->_redirect(\Lmerchant\Checkout\Model\Util\Constants::CANCEL_ROUTE);
+            $this->_logger->debug(__METHOD__. " Redirecting to cart");
+            $this->_redirect(LmerchantConstants::CANCEL_ROUTE);
             return;
         }
 
-        $this->_logger->info(__METHOD__. " Redirecting to success page. Order Id: {$orderId}");
+        $this->_logger->debug(__METHOD__. " Redirecting to success page. Order Id: {$orderId}");
 
         $this->_checkoutSession
             ->setLastQuoteId($quoteId)
@@ -62,12 +62,13 @@ class Complete extends \Magento\Framework\App\Action\Action
         $this->_checkoutSession->replaceQuote($this->_checkoutSession->getQuote()->save());
 
         $this->_logger->info(__METHOD__ .
+            " order complete ".
             " lastSuccessQuoteId: ".  $this->_checkoutSession->getLastSuccessQuoteId().
             " lastQuoteId:".$this->_checkoutSession->getLastQuoteId().
             " lastOrderId:".$this->_checkoutSession->getLastOrderId().
             " lastRealOrderId:" . $this->_checkoutSession->getLastRealOrderId());
         
-        $this->_redirect(\Lmerchant\Checkout\Model\Util\Constants::SUCCESS_ROUTE, [
+        $this->_redirect(LmerchantConstants::SUCCESS_ROUTE, [
             '_secure' => true,
             '_nosid' => true,
             'mage_order_id' => $orderId

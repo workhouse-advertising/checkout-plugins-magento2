@@ -18,7 +18,7 @@
                     <frontend_model>Lmerchant\Checkout\Block\Adminhtml\System\Config\Form\Version</frontend_model>
                 </field>
                 <field id="active" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Enabled</label>
+                    <label>Is Active ?</label>
                     <config_path>payment/lmerchant/active</config_path>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
@@ -32,8 +32,8 @@
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="debug" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Sandbox Mode</label>
-                    <config_path>payment/lmerchant/sandbox_mode</config_path>
+                    <label>Is Test Mode ?</label>
+                    <config_path>payment/lmerchant/test_mode</config_path>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
