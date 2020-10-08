@@ -1,7 +1,6 @@
 {
   "name": "lmerchant/module-checkout",
   "description": "Demo payment gateway integration",
-  "require": {},
   "authors": [
     {
       "name": "Lmerchant",
@@ -9,7 +8,7 @@
     }
   ],
   "type": "magento2-module",
-  "version": "100.0.3",
+  "version": "0.0.1",
   "license": [
     "OSL-3.0",
     "AFL-3.0"
