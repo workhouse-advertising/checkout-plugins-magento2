@@ -3,6 +3,7 @@
 namespace LMerchant\Checkout\Block\Adminhtml\System\Config\Form;
 
 use Magento\Backend\Block\Template\Context;
+use Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 
 class Version extends \Magento\Config\Block\System\Config\Form\Field
 {
@@ -27,13 +28,8 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
      */
     public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-        $version = '0.0.1';
-
-        if (!$version) {
-            $version = __('--');
-        }
         $output = '<div style="background-color:#eee;padding:1em;border:1px solid #ddd;">';
-        $output .= __('Module version') . ': ' . $version;
+        $output .= __('Module version') . ': ' . LmerchantConstants::PLUGIN_VERSION;
         $output .= "</div>";
         return '<div id="row_' . $element->getHtmlId() . '">' . $output . '</div>';
     }

@@ -136,6 +136,10 @@ class PaymentRequest
                     $paymentRequest['x_lineitem_' . $key . '_sku'] = (string)$item->getSku();
                     $paymentRequest['x_lineitem_' . $key . '_quantity'] = (string)$item->getQty();
                     $paymentRequest['x_lineitem_' . $key . '_amount'] = round((float)$item->getPriceInclTax(), $precision);
+                    $paymentRequest['x_lineitem_' . $key . '_image_url'] = (string)$item->getProductUrl();
+                    $paymentRequest['x_lineitem_' . $key . '_tax'] = round((float)$item->getPrice(), $precision) * round((float)$item->getTaxPercent(), $precision);
+                    $paymentRequest['x_lineitem_' . $key . '_unit_price'] = round((float)$item->getPrice(), $precision);
+                    $paymentRequest['x_lineitem_' . $key . '_requires_shipping'] = $item->isQuoteVirtual() ? "true" : "false";
                 }
             }
         }
@@ -155,6 +159,10 @@ class PaymentRequest
 
         $paymentRequest['x_merchant_id'] = $paymentGatewayConfig[LmerchantHelper::MERCHANT_ID];
         $paymentRequest['x_test'] = $paymentGatewayConfig[LmerchantHelper::TEST_MODE] ? "true" : "false";
+
+        $paymentRequest['x_platform_type'] = LmerchantConstants::PLATFORM_TYPE;
+        $paymentRequest['x_platform_version'] =$this->_lmerchantHelper->getPlatformVersion();
+        $paymentRequest['x_plugin_version'] = LmerchantConstants::PLUGIN_VERSION;
 
         $paymentRequest['x_signature'] = $this->_lmerchantHelper->getHMAC($paymentRequest);
 

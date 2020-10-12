@@ -3,6 +3,9 @@ namespace Lmerchant\Checkout\Model\Util;
 
 class Constants
 {
+    const PLATFORM_TYPE = "magento";
+    const PLUGIN_VERSION = "0.0.2";
+
     const METHOD_GUEST = 'guest';
     const METHOD_CODE = 'lmerchant';
     const MINUTE_DELAYED_ORDER = 75;

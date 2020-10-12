@@ -77,6 +77,16 @@ class Helper
         return hash_hmac("sha256", $message, $secret);
     }
 
+    public function getPlatformVersion() {
+        try {
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $productMetadata = $objectManager->get('\Magento\Framework\App\ProductMetadataInterface');
+            return $version = $productMetadata->getVersion();
+        } catch (\Exception $e) {
+            return "";
+        }
+    }
+
     private function _readConfig($path, $returnRaw = false)
     {
         $websiteId = $this->getWebsiteId();
