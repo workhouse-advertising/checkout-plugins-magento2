@@ -2,14 +2,6 @@
 
 namespace Lmerchant\Checkout\Controller\Payment;
 
-use \Magento\Checkout\Model\Session as CheckoutSession;
-use \Magento\Quote\Api\CartRepositoryInterface as CartRepository;
-use \Magento\Quote\Model\QuoteIdMaskFactory;
-use \Magento\Framework\Controller\Result\JsonFactory as JsonResultFactory;
-use \Magento\Quote\Model\QuoteValidator as QuoteValidator;
-
-use \Lmerchant\Checkout\Model\Adapter\PaymentRequest as PaymentRequestAdapter;
-use \Lmerchant\Checkout\Logger\Logger;
 use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 
 /**
@@ -24,39 +16,64 @@ class Process extends \Magento\Framework\App\Action\Action
     protected $_jsonResultFactory;
     protected $_quoteValidator;
 
+    protected $_lmerchantHelper;
     protected $_paymentRequestAdaptor;
     protected $_logger;
+
     /**
      * Process constructor.
-     * @param \Magento\Framework\App\Action\Context $context
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        CheckoutSession $checkoutSession,
-        CartRepository $cartRepository,
-        QuoteIdMaskFactory $quoteIdMaskFactory,
-        JsonResultFactory $jsonResultFactory,
-        QuoteValidator $quoteValidator,
-        PaymentRequestAdapter $paymentRequestAdaptor,
-        Logger $logger
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
+        \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
+        \Magento\Quote\Model\QuoteValidator $quoteValidator,
+        \Lmerchant\Checkout\Model\Util\Helper $lmerchantHelper,
+        \Lmerchant\Checkout\Model\Adapter\PaymentRequest $paymentRequestAdaptor,
+        \Lmerchant\Checkout\Logger\Logger $logger
     ) {
         $this->_checkoutSession = $checkoutSession;
         $this->_cartRepository = $cartRepository;
         $this->_quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->_jsonResultFactory = $jsonResultFactory;
         $this->_quoteValidator = $quoteValidator;
-        $this->_paymentRequestAdaptor = $paymentRequestAdaptor;
+
         $this->_logger = $logger;
+        $this->_lmerchantHelper = $lmerchantHelper;
+        $this->_paymentRequestAdaptor = $paymentRequestAdaptor;
 
         parent::__construct($context);
     }
 
     public function execute()
     {
-        // TODO: get payment flow from config
         $paymentMethod = 'authorize_capture';
 
-        $result = $this->_processCapture();
+        try {
+            $paymentRequest = $this->_processCapture();
+
+            $paymentRequest['success'] = true;
+            $paymentRequest['url'] = "https://api.dev.latitudefinancial.com/v1/applybuy-checkout-service/purchase";
+
+            $result = $this->_jsonResultFactory->create()->setData($paymentRequest);
+
+            return $result;
+        } catch (\LocalizedException $e) {
+            return $this->_processError($e);
+        } catch (\Exception $e) {
+            return $this->_processError($e);
+        }
+    }
+
+    private function _errorResponse(\Exception $exception)
+    {
+        $this->logger->error(__METHOD__. $exception->getRawMessage());
+
+        $result = $this->jsonResultFactory->create();
+        $result->setData(['error' => true, 'message' => __("Could not process request. Check logs for more details")]);
+
         return $result;
     }
 
@@ -64,18 +81,11 @@ class Process extends \Magento\Framework\App\Action\Action
     {
         $this->_logger->debug(__METHOD__. " Processing capture");
         
-        //TODO: get from config based on test mode
-        $BASE_URL = 'api.dev.latitudefinancial.com/v1/applybuy-checkout-service'; 
-
         $post = $this->getRequest()->getPostValue();
         $cartId = htmlspecialchars($post['cartId'], ENT_QUOTES);
 
         if (empty($cartId)) {
-            $result = $this->_jsonResultFactory->create()->setData(
-                ['error' => 1, 'message' => 'Invalid request']
-            );
-
-            return $result;
+            throw new \Exception(__("Invalid request"));
         }
 
         $data = $this->_checkoutSession->getData();
@@ -105,25 +115,12 @@ class Process extends \Magento\Framework\App\Action\Action
 
               // virtual products
                 if ($quote->isVirtual()) {
-                    try {
-                        $billingID =  $customerSession->getCustomer()->getDefaultBilling();
-                        $this->_logger->debug("No billing address for the virtual product. Adding the Customer's default billing address.");
-                        $address = $objectManager->create('Magento\Customer\Model\Address')->load($billingID);
-                        $billingAddress->addData($address->getData());
-                    } catch (\Exception $e) {
-                        $this->_logger->debug($e->getMessage());
-                        $result = $this->_jsonResultFactory->create()->setData(
-                            ['success' => false, 'message' => 'Invalid billing address']
-                        );
-
-                        return $result;
-                    }
+                    $billingID =  $customerSession->getCustomer()->getDefaultBilling();
+                    $this->_logger->debug("No billing address for the virtual product. Adding the Customer's default billing address.");
+                    $address = $objectManager->create('Magento\Customer\Model\Address')->load($billingID);
+                    $billingAddress->addData($address->getData());
                 } else {
-                    $result = $this->_jsonResultFactory->create()->setData(
-                        ['success' => false, 'message' => 'Invalid billing address']
-                    );
-
-                    return $result;
+                    throw new \Exception(__("Invalid billing address"));
                 }
             } elseif (empty($billingAddress) || empty($billingAddress->getStreetLine(1)) || empty($billingAddress->getFirstname())) {
                 $billingAddress = $quote->getShippingAddress();
@@ -146,17 +143,11 @@ class Process extends \Magento\Framework\App\Action\Action
             if (!empty($post['email'])) {
                 $email = htmlspecialchars($post['email'], ENT_QUOTES);
                 $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-                try {
-                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $quote->setCustomerEmail($email)
-                            ->setCustomerIsGuest(true)
-                            ->setCustomerGroupId(\Magento\Customer\Api\Data\GroupInterface::NOT_LOGGED_IN_ID);
-                    }
-                } catch (\Exception $e) {
-                    $result = $this->_jsonResultFactory->create()->setData(
-                        ['error' => 1, 'message' => $e->getMessage()]
-                    );
-                    return $result;
+
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $quote->setCustomerEmail($email)
+                        ->setCustomerIsGuest(true)
+                        ->setCustomerGroupId(\Magento\Customer\Api\Data\GroupInterface::NOT_LOGGED_IN_ID);
                 }
             }
         }
@@ -165,35 +156,14 @@ class Process extends \Magento\Framework\App\Action\Action
 
         $quote->getPayment()->setMethod(LmerchantConstants::METHOD_CODE);
 
-        try {
-            $this->_quoteValidator->validateBeforeSubmit($quote);
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $result = $this->_jsonResultFactory->create()->setData(
-                ['success' => false, 'message' => $e->getMessage()]
-            );
-            return $result;
-        }
-
+        $this->_quoteValidator->validateBeforeSubmit($quote);
         $this->_cartRepository->save($quote);
         $this->_checkoutSession->replaceQuote($quote);
 
         $this->_logger->info(__METHOD__. " Quote saved. Quote id: {$quoteId}");
 
-        try {
-            $paymentRequest = $this->_paymentRequestAdaptor->get($quote, $quoteId);
-        } catch (\Exception $e) {
-            $result = $this->_jsonResultFactory->create()->setData(
-                ['error' => 1, 'message' => $e->getMessage()]
-            );
+        $paymentRequest = $this->_paymentRequestAdaptor->get($quote, $quoteId);
 
-            return $result;
-        }
-        
-        $paymentRequest['success'] = true;
-        $paymentRequest['url'] = "https://{$BASE_URL}/purchase";
-
-        $result = $this->_jsonResultFactory->create()->setData($paymentRequest);
-
-        return $result;
+        return $paymentRequest;
     }
 }

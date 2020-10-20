@@ -72,6 +72,7 @@ define([
         },
       })
         .done(function (response) {
+          console.log({ response });
           var data = response;
 
           var redirectToPortal = function (paymentRequest) {
@@ -98,9 +99,9 @@ define([
           };
 
           if (
-            data.success &&
+            typeof data.success !== "undefined" &&
             typeof data.url !== "undefined" &&
-            data.url !== null
+            data.success
           ) {
             $("body").ajaxStop(function () {
               ajaxRedirected = true;
@@ -127,13 +128,12 @@ define([
 
             return;
           }
-
-          globalMessageList.addErrorMessage({
-            message: data.message,
-          });
         })
-        .fail(function () {
-          window.location.reload();
+        .fail(function (xhr, status ) {
+          console.error("request failed with status " + status); 
+          globalMessageList.addErrorMessage({
+            message: "We could not process this request at this time, please try again or select other payment method",
+          });
         })
         .always(function () {
           customerData.invalidate(["cart"]);

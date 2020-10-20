@@ -1,11 +1,8 @@
 <?php
 namespace Lmerchant\Checkout\Model\Adapter;
 
-use \Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
-use \Magento\Catalog\Api\ProductRepositoryInterface as ProductRepositoryInterface;
-
-use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
 use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
+use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
 
 /**
  * Class PaymentRequest
@@ -23,8 +20,8 @@ class PaymentRequest
      * @param ProductRepositoryInterface $productRepositoryInterface
      */
     public function __construct(
-        StoreManagerInterface $storeManagerInterface,
-        ProductRepositoryInterface $productRepositoryInterface,
+        \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryInterface,
         LmerchantHelper $lmerchantHelper
     ) {
         $this->_storeManagerInterface = $storeManagerInterface;
@@ -65,7 +62,7 @@ class PaymentRequest
         }
         
         if (count($errors)) {
-            throw new \Magento\Framework\Exception\LocalizedException(__(implode($errors, ' ; ')));
+            throw new \Exception(__(implode($errors, ' ; ')));
         } else {
             return true;
         }
@@ -139,7 +136,8 @@ class PaymentRequest
                     $paymentRequest['x_lineitem_' . $key . '_image_url'] = (string)$item->getProductUrl();
                     $paymentRequest['x_lineitem_' . $key . '_tax'] = round((float)$item->getPrice(), $precision) * round((float)$item->getTaxPercent(), $precision);
                     $paymentRequest['x_lineitem_' . $key . '_unit_price'] = round((float)$item->getPrice(), $precision);
-                    $paymentRequest['x_lineitem_' . $key . '_requires_shipping'] = $item->isQuoteVirtual() ? "true" : "false";
+                    $paymentRequest['x_lineitem_' . $key . '_requires_shipping'] = $quote->isVirtual() ? "false" : "true";
+                    $paymentRequest['x_lineitem_' . $key . '_gift_card'] = $quote->isVirtual() ? "true" : "false";
                 }
             }
         }

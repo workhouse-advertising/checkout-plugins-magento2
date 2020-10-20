@@ -1,6 +1,6 @@
 <?php
 
-namespace LMerhant\Checkout\Block;
+namespace Lmerhant\Checkout\Block;
 
 use Magento\Framework\View\Element\Template;
 

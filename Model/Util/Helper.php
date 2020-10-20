@@ -1,11 +1,6 @@
 <?php
 namespace Lmerchant\Checkout\Model\Util;
 
-use \Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfigInterface;
-use \Magento\Framework\App\State as State;
-use \Magento\Framework\App\Request\Http as Request;
-use \Magento\Store\Model\StoreManagerInterface as StoreManagerInterface;
-
 /**
  * Class Helper
  * @package Lmerchant\Checkout\Model\Util
@@ -23,10 +18,10 @@ class Helper
     protected $storeManager;
 
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        State $state,
-        Request $request,
-        StoreManagerInterface $storeManager
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\App\State $state,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->state = $state;
@@ -54,10 +49,17 @@ class Helper
         return $config;
     }
 
+    public function isTestMode()
+    {
+        return boolval($this->_readConfig(self::TEST_MODE));
+    }
+
     public function getHMAC($payload)
     {
+        $message = "";
+
         if (!is_array($payload)) {
-            return '';
+            return "";
         }
 
         $secret = $this->_readConfig(self::MERCHANT_SECRET, true);
@@ -68,8 +70,6 @@ class Helper
 
         ksort($payload);
 
-        $message = "";
-
         foreach ($payload as $key => $value) {
             $message .= $key . $value;
         }
@@ -77,7 +77,8 @@ class Helper
         return hash_hmac("sha256", $message, $secret);
     }
 
-    public function getPlatformVersion() {
+    public function getPlatformVersion()
+    {
         try {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             $productMetadata = $objectManager->get('\Magento\Framework\App\ProductMetadataInterface');

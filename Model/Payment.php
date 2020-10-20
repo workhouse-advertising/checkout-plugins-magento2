@@ -1,7 +1,7 @@
 <?php
 namespace Lmerchant\Checkout\Model;
 
-use Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
+use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 
 class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 {

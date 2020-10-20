@@ -1,24 +1,22 @@
 <?php
 namespace Lmerchant\Checkout\Api;
 
-use Magento\Quote\Api\CartRepositoryInterface as CartRepository;
-use Magento\Quote\Model\QuoteValidator;
-use Magento\Quote\Model\QuoteManagement;
-use Magento\Framework\Exception\LocalizedException;
-
-use Lmerchant\Checkout\Logger\Logger;
 use Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
 use Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 
 class Callback
 {
-    protected $cartRepository;
-    protected $quoteValidator;
-    protected $quoteManagement;
+    protected $request;
+    protected $jsonHelper;
+    protected $jsonResultFactory;
+    protected $eventManager;
+    protected $messageManager;
 
     protected $logger;
+    protected $orderAdapter;
     protected $lmerchantHelper;
 
+    const ORDER_ID = 'order_id';
     const MERCHANT_ID = 'merchant_id';
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
@@ -29,21 +27,33 @@ class Callback
     const TRANSACTION_TYPE = 'transaction_type';
     const TEST = 'test';
     const MESSAGE = 'message';
+    const TIMESTAMP = 'timestamp';
+    const SIGNATURE = 'signature';
 
     public function __construct(
-        CartRepository $cartRepository,
-        QuoteValidator $quoteValidator,
-        QuoteManagement $quoteManagement,
-        Logger $logger,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
+        \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Lmerchant\Checkout\Logger\Logger $logger,
+        \Lmerchant\Checkout\Model\Adapter\Order $orderAdapter,
         LmerchantHelper $lmerchantHelper
     ) {
-        $this->cartRepository = $cartRepository;
-        $this->quoteValidator = $quoteValidator;
-        $this->quoteManagement = $quoteManagement;
+        $this->request = $request;
+        $this->jsonHelper = $jsonHelper;
+        $this->jsonResultFactory = $jsonResultFactory;
+        $this->eventManager = $eventManager;
+        $this->messageManager = $messageManager;
 
         $this->logger = $logger;
+        $this->orderAdapter = $orderAdapter;
         $this->lmerchantHelper = $lmerchantHelper;
     }
+
+    /**
+     * {@inheritdoc}
+     */
 
     public function handle(
         string $merchantId,
@@ -56,124 +66,109 @@ class Callback
         string $transactionType,
         string $test,
         string $message,
+        string $timestamp,
         string $signature
     ) {
-        $this->logger->debug(__METHOD__. " Begin update for Merchant reference: {$merchantReference}");
+        $post[self::MERCHANT_ID] = $merchantId;
+        $post[self::AMOUNT] = $amount;
+        $post[self::CURRENCY] = $currency;
+        $post[self::MERCHANT_REFERENCE] = $merchantReference;
+        $post[self::GATEWAY_REFERENCE] = $gatewayReference;
+        $post[self::PROMOTION_REFERENCE] = $promotionReference;
+        $post[self::RESULT] = $result;
+        $post[self::TRANSACTION_TYPE] = $transactionType;
+        $post[self::TEST] = $test;
+        $post[self::MESSAGE] = $message;
+        $post[self::TIMESTAMP] = $timestamp;
 
-        $callbackRequest[self::MERCHANT_ID] = isset($merchantId) ? $merchantId : "";
-        $callbackRequest[self::AMOUNT] = isset($amount) ? $amount : "";
-        $callbackRequest[self::CURRENCY] = isset($currency) ? $currency : "";
-        $callbackRequest[self::MERCHANT_REFERENCE] = isset($merchantReference) ? $merchantReference: "";
-        $callbackRequest[self::GATEWAY_REFERENCE] = isset($gatewayReference) ? $gatewayReference : "";
-        $callbackRequest[self::PROMOTION_REFERENCE] = isset($promotionReference) ? $promotionReference : "";
-        $callbackRequest[self::RESULT] = isset($result) ? $result : "";
-        $callbackRequest[self::TRANSACTION_TYPE] = isset($transactionType) ? $transactionType : "";
-        $callbackRequest[self::TEST] = isset($test) ? $test : "false";
-        $callbackRequest[self::MESSAGE] = isset($message) ? $message : "";
-
-
-        if (!$this->_validateRequest($callbackRequest, $signature)) {
-            throw new \Magento\Framework\Webapi\Exception(__("Bad request"), 400);
-        }
-
-        $response["merchant_reference" -> $merchantReference];
-        $response["gateway_reference" -> $gatewayReference];
-
-        if ($result == LmerchantHelper::TRANSACTION_RESULT_FAILED) {
-            $this->messageManager->addError($message);
-            $response["success" -> true];
-            
-            $this->logger->error(__METHOD__. " Order Failed, merchant reference: ". merchantReference. ", gateway reference: ". $gatewayReference);
-            return $response;
-        }
+        $this->logger->debug(__METHOD__. " Begin callback with request: " . $this->jsonHelper->jsonEncode($post));
 
         try {
-            $quote = $this->cartRepository->get($merchantReference);
-            if (!$quote->getId()) {
-                $this->logger->error(__METHOD__. " Error loading quote: {$merchantReference}");
-                throw new LocalizedException(__("Internal Error"));
+            if (!$this->_validateRequest($post, $signature)) {
+                throw new \Exception(__("Could not Validate Request"));
             }
 
-            $orderId = $this->_createOrder($request, $quote);
+            if ($post[self::RESULT] == LmerchantConstants::TRANSACTION_RESULT_FAILED) {
+                $this->_dispatch($post, false);
+                $this->messageManager->addExceptionMessage(
+                    new \Exception(__("Quote ". $merchantReference. " failed")),
+                    __("Your payment was not successful, please try again or select other payment method")
+                );
+                return $gatewayReference;
+            }
 
-            $response["order_id" -> $orderId];
-            $response["success" -> true];
-            
-            $this->logger->debug(__METHOD__. " Order Created");
-            return $response;
-        } catch (LocalizedException $e) {
+            $orderId = $this->orderAdapter->create(
+                $post[self::MERCHANT_REFERENCE],
+                $post[self::GATEWAY_REFERENCE],
+                $post[self::PROMOTION_REFERENCE],
+            );
+
+            $this->logger->info(__METHOD__. " Order Created");
+            $this->_dispatch($post, true);
+
+            return $orderId;
+        } catch (\Exception $e) {
             if (preg_match('/Invalid state change requested/i', $e->getMessage())) {
                 $this->logger->debug(__METHOD__. " Ignored: Invalid state change requested ");
-                return $response;
+                return $gatewayReference;
             }
 
-            $this->logger->error(__METHOD__. " Caught LocalizedException ". $e->getMessage());
-            throw new \Magento\Framework\Webapi\Exception(__("Could not update order, Bad request"), 400);
-        } catch (Exception $e) {
-            $this->logger->error(__METHOD__. " Caught Exception");
-            throw new \Magento\Framework\Webapi\Exception(__("Unhandled Error"), 500);
+            $this->logger->error(__METHOD__. " ". $e->getMessage());
+            throw new \Magento\Framework\Webapi\Exception(__('Bad Request'), 400);
+        } catch (\Exception $e) {
+            $this->logger->error(__METHOD__. " ". $e->getMessage());
+            throw new \Magento\Framework\Webapi\Exception(__('Bad Request'), 400);
         }
     }
 
-    private function _validateRequest(array $req, string $signature)
+    private function _validateRequest($post, $signature)
     {
-        $allowedTransactionResults = array(
-            LmerchantConstants::TRANSACTION_RESULT_COMPLETED,
-            LmerchantConstants::TRANSACTION_RESULT_FAILED,
-        );
+        if (empty($signature) || $signature != $this->lmerchantHelper->getHMAC($post)) {
+            $this->logger->debug(__METHOD__. " actual: ". $signature);
+            $this->logger->debug(__METHOD__. " expected: ". $this->lmerchantHelper->getHMAC($post));
+            $this->logger->error(__METHOD__. " Could not verify HMAC");
+            return false;
+        }
 
         $paymentGatewayConfig = $this->lmerchantHelper->getConfig();
-
-        if (isset($signature) || empty($signature)) {
-            $this->logger->error(__METHOD__. " signature is mandatory ");
+        if ($post[self::MERCHANT_ID] != $paymentGatewayConfig[LmerchantHelper::MERCHANT_ID]) {
+            $this->logger->error(__METHOD__. " Unexpected merchant id ". $post[self::MERCHANT_ID]);
             return false;
         }
 
-        if ($req[self::MERCHANT_ID] != $paymentGatewayConfig[LmerchantHelper::MERCHANT_ID]) {
-            $this->logger->error(__METHOD__. " invalid merchant id ". $merchantId);
+        if (!in_array($post[self::CURRENCY], LmerchantConstants::ALLOWED_CURRENCY)) {
+            $this->logger->error(__METHOD__. " Unsupported currency");
+            return false;
+        }
+        
+        if (!in_array($post[self::RESULT], array(
+                LmerchantConstants::TRANSACTION_RESULT_COMPLETED,
+                LmerchantConstants::TRANSACTION_RESULT_FAILED,
+            ))) {
+            $this->logger->error(__METHOD__. " Unsupported result");
             return false;
         }
 
-        if ($signature != $this->lmerchantHelper->getHMAC($req)) {
-            $this->logger->error(__METHOD__. " could not verify HMAC");
-            return false;
-        }
-
-        if (
-            !in_array($req[self::CURRENCY], LmerchantConstants::ALLOWED_CURRENCY) ||
-            !in_array($req[self::RESULT], $allowedTransactionResults) ||
-            $req[self::TRANSACTION_TYPE] !=  LmerchantConstants::TRANSACTION_TYPE_SALE
-            ) {
-            $this->logger->error(__METHOD__. " unsupported currency, result or transaction type");
+        if (!in_array($post[self::TRANSACTION_TYPE], array(
+                LmerchantConstants::TRANSACTION_TYPE_SALE,
+            ))) {
+            $this->logger->error(__METHOD__. " Unsupported transaction type");
             return false;
         }
 
         return true;
     }
 
-    private function _createOrder(string $merchantReference, string $gatewayReference, string $promotionReference, string $result, $quote)
+    private function _dispatch($post, $isCompleted)
     {
-        $this->logger->debug(__METHOD__. " Begin create order merchant ref: {$merchantReference}, gateway ref: {$gatewayReference}");
-        $quoteId = $quote->getId();
-        $quote->getPayment()->setMethod(LmerchantConstants::METHOD_CODE);
-        $payment = $quote->getPayment();
-
-        $payment->setAdditionalInformation(LmerchantConstants::CART_ID, $merchantReference);
-        $payment->setAdditionalInformation(LmerchantConstants::GATEWAY_REFERENCE, $gatewayReference);
-        $payment->setAdditionalInformation(LmerchantConstants::PROMOTION_REFERENCE, $promotionReference);
-        $payment->setAdditionalInformation(LmerchantConstants::PAYMENT_RESULT, $result);
-        
-        $info = $payment->getAdditionalInformation();
-        $quote->setPayment($payment);
-
-        $this->quoteValidator->validateBeforeSubmit($quote);
-        $payment->save();
-        $quote->save();
-
-        $this->logger->debug(__METHOD__. " Converting Quote -> Order");
-
-        $orderId = $this->quoteManagement->placeOrder($quoteId);
-
-        return $orderId;
+        $this->eventManager->dispatch(
+            $isCompleted ? LmerchantConstants::EVENT_COMPLETED : LmerchantConstants::EVENT_FAILED,
+            [
+                'quote' => $post[self::MERCHANT_REFERENCE],
+                'merchant_reference' => $post[self::GATEWAY_REFERENCE],
+                'transaction_type' => $post[self::TRANSACTION_TYPE],
+                'result' => $post[self::RESULT],
+            ]
+        );
     }
 }

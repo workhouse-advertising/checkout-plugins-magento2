@@ -2,10 +2,6 @@
 
 namespace Lmerchant\Checkout\Controller\Payment;
 
-use \Magento\Checkout\Model\Session as CheckoutSession;
-use \Magento\Quote\Api\CartRepositoryInterface as CartRepository;
-
-use \Lmerchant\Checkout\Logger\Logger;
 use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 
 /**
@@ -14,66 +10,91 @@ use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
  */
 class Complete extends \Magento\Framework\App\Action\Action
 {
-    protected $_checkoutSession;
-    protected $_cartRepository;
+    protected $request;
+    protected $checkoutSession;
+    protected $cartRepository;
 
-    protected $_logger;
+    protected $logger;
     /**
      * Complete constructor.
      * @param \Magento\Framework\App\Action\Context $context
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        CheckoutSession $checkoutSession,
-        CartRepository $cartRepository,
-        Logger $logger
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        \Lmerchant\Checkout\Logger\Logger $logger
     ) {
-        $this->_checkoutSession = $checkoutSession;
-        $this->_cartRepository = $cartRepository;
-        $this->_logger = $logger;
+        $this->request = $request;
+        $this->checkoutSession = $checkoutSession;
+        $this->cartRepository = $cartRepository;
+        $this->logger = $logger;
 
         parent::__construct($context);
     }
 
     public function execute()
     {
-        $this->_logger->debug(__METHOD__. " Begin");
-        
-        $quoteId = $this->getRequest()->getParam('reference');
+        $this->logger->debug(__METHOD__. " Begin");
 
-        $quote = $this->_cartRepository->get($quoteId);
-        $orderId = $quote->getReservedOrderId();
+        try {
+            $quoteId = $this->request->getParam('reference');
 
-        if (empty($quoteId) || empty($orderId)) {
-            $this->_logger->debug(__METHOD__. " Redirecting to cart");
-            $this->_redirect(LmerchantConstants::CANCEL_ROUTE);
-            return;
-        }
+            if (empty($quoteId)) {
+                $this->_processError(new \Exception(__("Invalid quoteId: ". $quoteId)));
+                return;
+            }
 
-        $this->_logger->debug(__METHOD__. " Redirecting to success page. Order Id: {$orderId}");
+            $quote = $this->cartRepository->get($quoteId);
+            $orderId = $quote->getReservedOrderId();
 
-        $this->_checkoutSession
+            if (empty($orderId)) {
+                $this->_processError(new \Exception(__("Invalid orderId". $orderId)));
+                return;
+            }
+
+            if (boolval($quote->getIsActive())) {
+                $this->_processError(new \Exception(__("Could not show success for active quote")));
+                return;
+            }
+
+            $this->logger->debug(__METHOD__. " Redirecting to success page. Order Id: {$orderId}");
+
+            $this->checkoutSession
             ->setLastQuoteId($quoteId)
             ->setLastSuccessQuoteId($quoteId)
             ->setLastOrderId($orderId)
             ->setLastRealOrderId($orderId);
 
-        $this->_checkoutSession->setLoadInactive(false);
-        $this->_checkoutSession->replaceQuote($this->_checkoutSession->getQuote()->save());
+            $this->checkoutSession->setLoadInactive(false);
+            $this->checkoutSession->replaceQuote($this->checkoutSession->getQuote()->save());
 
-        $this->_logger->info(__METHOD__ .
+            $this->logger->debug(__METHOD__ .
             " order complete ".
-            " lastSuccessQuoteId: ".  $this->_checkoutSession->getLastSuccessQuoteId().
-            " lastQuoteId:".$this->_checkoutSession->getLastQuoteId().
-            " lastOrderId:".$this->_checkoutSession->getLastOrderId().
-            " lastRealOrderId:" . $this->_checkoutSession->getLastRealOrderId());
+            " lastSuccessQuoteId: ".  $this->checkoutSession->getLastSuccessQuoteId().
+            " lastQuoteId:".$this->checkoutSession->getLastQuoteId().
+            " lastOrderId:".$this->checkoutSession->getLastOrderId().
+            " lastRealOrderId:" . $this->checkoutSession->getLastRealOrderId());
         
-        $this->_redirect(LmerchantConstants::SUCCESS_ROUTE, [
-            '_secure' => true,
-            '_nosid' => true,
-            'mage_order_id' => $orderId
-        ]);
+            $this->_redirect('checkout/onepage/success', [
+                '_secure' => true,
+                '_nosid' => true,
+                'mage_order_id' => $orderId
+            ]);
+            return;
+        } catch (\LocalizedException $e) {
+            $this->logger->error(__METHOD__. $e->getRawMessage());
+            $this->_processError($e);
+        }
+        catch (\Exception $e) {
+            $this->logger->error(__METHOD__. $e->getRawMessage());
+            $this->_processError($e);
+        }
+    }
 
-        return;
+    private function _processError(\Exception $exception)
+    {
+        $this->_redirect('checkout?cancel', ['_fragment' => 'payment']);
     }
 }
