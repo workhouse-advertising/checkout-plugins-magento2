@@ -100,7 +100,7 @@ class Callback
             $orderId = $this->orderAdapter->create(
                 $post[self::MERCHANT_REFERENCE],
                 $post[self::GATEWAY_REFERENCE],
-                $post[self::PROMOTION_REFERENCE],
+                $post[self::PROMOTION_REFERENCE]
             );
 
             $this->logger->info(__METHOD__. " Order Created");
@@ -143,14 +143,14 @@ class Callback
         
         if (!in_array($post[self::RESULT], array(
                 LmerchantConstants::TRANSACTION_RESULT_COMPLETED,
-                LmerchantConstants::TRANSACTION_RESULT_FAILED,
+                LmerchantConstants::TRANSACTION_RESULT_FAILED
             ))) {
             $this->logger->error(__METHOD__. " Unsupported result");
             return false;
         }
 
         if (!in_array($post[self::TRANSACTION_TYPE], array(
-                LmerchantConstants::TRANSACTION_TYPE_SALE,
+                LmerchantConstants::TRANSACTION_TYPE_SALE
             ))) {
             $this->logger->error(__METHOD__. " Unsupported transaction type");
             return false;
@@ -167,7 +167,7 @@ class Callback
                 'quote' => $post[self::MERCHANT_REFERENCE],
                 'merchant_reference' => $post[self::GATEWAY_REFERENCE],
                 'transaction_type' => $post[self::TRANSACTION_TYPE],
-                'result' => $post[self::RESULT],
+                'result' => $post[self::RESULT]
             ]
         );
     }
