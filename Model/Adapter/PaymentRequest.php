@@ -132,7 +132,7 @@ class PaymentRequest
                     $paymentRequest['x_lineitem_' . $key . '_name'] = (string)$item->getName();
                     $paymentRequest['x_lineitem_' . $key . '_sku'] = (string)$item->getSku();
                     $paymentRequest['x_lineitem_' . $key . '_quantity'] = (string)$item->getQty();
-                    $paymentRequest['x_lineitem_' . $key . '_amount'] = round((float)$item->getPriceInclTax(), $precision);
+                    $paymentRequest['x_lineitem_' . $key . '_amount'] = round((float)$item->getQty() * (float)$item->getPriceInclTax(), $precision);
                     $paymentRequest['x_lineitem_' . $key . '_image_url'] = (string)$item->getProductUrl();
                     $paymentRequest['x_lineitem_' . $key . '_tax'] = round((float)$item->getPrice(), $precision) * round((float)($item->getTaxPercent() / 100), $precision);
                     $paymentRequest['x_lineitem_' . $key . '_unit_price'] = round((float)$item->getPrice(), $precision);
