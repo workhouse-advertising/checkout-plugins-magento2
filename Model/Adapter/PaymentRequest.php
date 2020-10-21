@@ -10,8 +10,6 @@ use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
  */
 class PaymentRequest
 {
-    private $precision = 2;
-
     protected $_storeManagerInterface;
     protected $_productRepositoryInterface;
     protected $_lmerchantHelper;
@@ -79,6 +77,8 @@ class PaymentRequest
      */
     protected function _createRequest($quote, $quoteId)
     {
+        $precision = 2;
+
         $baseUrl = $this->_storeManagerInterface->getStore($quote->getStore()->getId())->getBaseUrl();
 
         $additionalData = $quote->getData();
@@ -132,7 +132,7 @@ class PaymentRequest
                     $paymentRequest['x_lineitem_' . $key . '_name'] = (string)$item->getName();
                     $paymentRequest['x_lineitem_' . $key . '_sku'] = (string)$item->getSku();
                     $paymentRequest['x_lineitem_' . $key . '_quantity'] = (string)$item->getQty();
-                    $paymentRequest['x_lineitem_' . $key . '_amount'] = round((int)$item->getQty() * (float)$item->getPriceInclTax(), $precision);
+                    $paymentRequest['x_lineitem_' . $key . '_amount'] = round((float)$item->getQty() * (float)$item->getPriceInclTax(), $precision);
                     $paymentRequest['x_lineitem_' . $key . '_image_url'] = (string)$item->getProductUrl();
                     $paymentRequest['x_lineitem_' . $key . '_tax'] = round((float)$item->getPrice(), $precision) * round((float)($item->getTaxPercent() / 100), $precision);
                     $paymentRequest['x_lineitem_' . $key . '_unit_price'] = round((float)$item->getPrice(), $precision);
@@ -142,9 +142,16 @@ class PaymentRequest
             }
         }
 
-        $paymentRequest['x_shipping_amount'] = $this->_getShippingAmount($shippingAddress);
-        $paymentRequest['x_tax_amount'] = $this->_getTaxAmount($shippingAddress, $additionalData);
-        $paymentRequest['x_discount_amount'] = $this->_getDiscount($quote, $additionalData);
+        if ($quote->getShippingAddress()->getShippingAmount()) {
+            $paymentRequest['x_shipping_amount'] = round((float)$quote->getShippingAddress()->getShippingAmount(), $precision);
+        }
+
+        if (isset($additionalData['discount_amount'])) {
+            $paymentRequest['x_discount_amount'] = round((float)$additionalData['discount_amount'], $precision);
+        }
+
+        $taxAmount = array_key_exists('tax_amount', $additionalData) ? $additionalData['tax_amount'] : $shippingAddress->getTaxAmount();
+        $paymentRequest['x_tax_amount'] = isset($taxAmount) ? round((float)$taxAmount, $precision) : 0;
 
         $paymentGatewayConfig =  $this->_lmerchantHelper->getConfig();
 
@@ -158,44 +165,5 @@ class PaymentRequest
         $paymentRequest['x_signature'] = $this->_lmerchantHelper->getHMAC($paymentRequest);
 
         return $paymentRequest;
-    }
-
-    private function _getShippingAmount($shippingAddress)
-    {
-        if ($shippingAddress->getShippingAmount()) {
-            return round((float)$shippingAddress->getShippingAmount(), $precision);
-        }
-
-        return 0;
-    }
-
-    private function _getTaxAmount($shippingAddress, $additionalData)
-    {
-        if ($shippingAddress->getTaxAmount()) {
-            return round((float)$shippingAddress->getTaxAmount(), $precision);
-        }
-
-        if (isset($additionalData['tax_amount'])) {
-            return round((float)$additionalData['tax_amount'], $precision);
-        }
-
-        return 0;
-    }
-
-    private function _getDiscountAmount($quote, $additionalData)
-    {
-        if ($quote->getDiscountAmount()) {
-            return round((float)$quote->getDiscountAmount(), $precision);
-        }
-
-        if (isset($additionalData['discount_amount'])) {
-            return round((float)$additionalData['discount_amount'], $precision);
-        }
-
-        if ($quote->getSubtotalWithDiscount() && $quote->getSubtotal()) {
-            return round((float)($quote->getSubtotalWithDiscount() - $quote->getSubtotal()), $precision);
-        }
-
-        return 0;
     }
 }
