@@ -10,7 +10,6 @@ class Callback
     protected $jsonHelper;
     protected $jsonResultFactory;
     protected $eventManager;
-    protected $messageManager;
 
     protected $logger;
     protected $orderAdapter;
@@ -35,7 +34,6 @@ class Callback
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
         \Magento\Framework\Event\ManagerInterface $eventManager,
-        \Magento\Framework\Message\ManagerInterface $messageManager,
         \Lmerchant\Checkout\Logger\Logger $logger,
         \Lmerchant\Checkout\Model\Adapter\Order $orderAdapter,
         LmerchantHelper $lmerchantHelper
@@ -44,7 +42,6 @@ class Callback
         $this->jsonHelper = $jsonHelper;
         $this->jsonResultFactory = $jsonResultFactory;
         $this->eventManager = $eventManager;
-        $this->messageManager = $messageManager;
 
         $this->logger = $logger;
         $this->orderAdapter = $orderAdapter;

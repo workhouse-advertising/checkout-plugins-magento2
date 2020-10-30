@@ -61,16 +61,16 @@ class Process extends \Magento\Framework\App\Action\Action
             $result = $this->_jsonResultFactory->create()->setData($paymentRequest);
 
             return $result;
-        } catch (\LocalizedException $e) {
-            return $this->_processError($e);
-        } catch (\Exception $e) {
-            return $this->_processError($e);
+        } catch (\Magento\Framework\Exception\LocalizedException $locallizedException) {
+            return $this->_processError($locallizedException);
+        } catch (\Exception $exception) {
+            return $this->_processError($exception);
         }
     }
 
-    private function _errorResponse(\Exception $exception)
+    private function _errorResponse(\Exception $e)
     {
-        $this->logger->error(__METHOD__. $exception->getMessage());
+        $this->logger->error(__METHOD__. $e->getMessage());
 
         $result = $this->jsonResultFactory->create();
         $result->setData(['error' => true, 'message' => __("Could not process request. Check logs for more details")]);

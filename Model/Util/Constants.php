@@ -13,7 +13,7 @@ class Constants
     const EVENT_FAILED = 'latitude_order_failed';
 
     const CALLBACK_ROUTE = 'rest/V1/lmerchant/callback';
-    const CANCEL_ROUTE = 'lmerchant/payment/complete';
+    const CANCEL_ROUTE = 'checkout/cart';
     const COMPLETE_ROUTE = 'lmerchant/payment/complete';
 
     const QUOTE_ID= 'quote_id';
