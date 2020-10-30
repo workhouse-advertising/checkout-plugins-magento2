@@ -13,6 +13,7 @@ class Complete extends \Magento\Framework\App\Action\Action
     protected $request;
     protected $checkoutSession;
     protected $cartRepository;
+    protected $quoteValidator;
 
     protected $logger;
     /**
@@ -24,11 +25,13 @@ class Complete extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Request\Http $request,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        \Magento\Quote\Model\QuoteValidator $quoteValidator,
         \Lmerchant\Checkout\Logger\Logger $logger
     ) {
         $this->request = $request;
         $this->checkoutSession = $checkoutSession;
         $this->cartRepository = $cartRepository;
+        $this->quoteValidator = $quoteValidator;
         $this->logger = $logger;
 
         parent::__construct($context);
@@ -48,6 +51,8 @@ class Complete extends \Magento\Framework\App\Action\Action
 
             $quote = $this->cartRepository->get($quoteId);
             $orderId = $quote->getReservedOrderId();
+
+            $this->quoteValidator->validateBeforeSubmit($quote);
 
             if (empty($orderId)) {
                 $this->_processError(new \Exception(__("Invalid orderId". $orderId)));
@@ -84,17 +89,18 @@ class Complete extends \Magento\Framework\App\Action\Action
             ]);
             return;
         } catch (\LocalizedException $e) {
-            $this->logger->error(__METHOD__. $e->getRawMessage());
             $this->_processError($e);
-        }
-        catch (\Exception $e) {
-            $this->logger->error(__METHOD__. $e->getRawMessage());
+        } catch (\Exception $e) {
             $this->_processError($e);
         }
     }
 
     private function _processError(\Exception $exception)
     {
-        $this->_redirect('checkout?cancel', ['_fragment' => 'payment']);
+        $this->logger->error(__METHOD__. $e->getRawMessage());
+        $this->_messageManager->addErrorMessage(
+            __('Your payment was not successful, please try again or select other payment method')
+        );
+        $this->_redirect("checkout/cart");
     }
 }

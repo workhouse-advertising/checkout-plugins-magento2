@@ -12,8 +12,8 @@ class Constants
     const EVENT_COMPLETED = 'latitude_order_completed';
     const EVENT_FAILED = 'latitude_order_failed';
 
-    const CANCEL_ROUTE = 'checkout/cart';
     const CALLBACK_ROUTE = 'rest/V1/lmerchant/callback';
+    const CANCEL_ROUTE = 'lmerchant/payment/complete';
     const COMPLETE_ROUTE = 'lmerchant/payment/complete';
 
     const QUOTE_ID= 'quote_id';

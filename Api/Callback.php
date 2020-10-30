@@ -4,7 +4,6 @@ namespace Lmerchant\Checkout\Api;
 use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
 use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
 
-
 class Callback
 {
     protected $request;
@@ -90,11 +89,8 @@ class Callback
             }
 
             if ($post[self::RESULT] == LmerchantConstants::TRANSACTION_RESULT_FAILED) {
+                $this->orderAdapter->addError($post[self::MERCHANT_REFERENCE], "Order failed with message ". $post[self::MESSAGE]);
                 $this->_dispatch($post, false);
-                $this->messageManager->addExceptionMessage(
-                    new \Exception(__("Quote ". $merchantReference. " failed")),
-                    __("Your payment was not successful, please try again or select other payment method")
-                );
                 return $gatewayReference;
             }
 

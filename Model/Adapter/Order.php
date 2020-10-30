@@ -25,15 +25,7 @@ class Order
 
     public function create($quoteId, $gatewayReference, $promotionReference)
     {
-        $quote = $this->cartRepository->get($quoteId);
-
-        if (!$quote->getGrandTotal()) {
-            throw new \Exception(__METHOD__. " Cannot process order with zero balance.");
-        }
-
-        if (!$quote->getId()) {
-            throw new \Exception(__METHOD__. " Error loading quote {$quoteId}.");
-        }
+        $quote = $this->_getQuoteById(quoteId);
 
         $quote->getPayment()->setMethod(LmerchantConstants::METHOD_CODE);
         $payment = $quote->getPayment();
@@ -50,5 +42,25 @@ class Order
         $quote->save();
 
         return $this->quoteManagement->placeOrder($quoteId);
+    }
+
+    public function addError($quoteId, $message)
+    {
+        $quote = $this->_getQuoteById(quoteId)->addErrorInfo('error', 'Lmerchant_Checkout', 1, $message, null);
+    }
+
+    private function _getQuoteById($quoteId)
+    {
+        $quote = $this->cartRepository->get($quoteId);
+
+        if (!$quote->getGrandTotal()) {
+            throw new \Exception(__METHOD__. " Cannot process quote with zero balance.");
+        }
+
+        if (!$quote->getId()) {
+            throw new \Exception(__METHOD__. " Error loading quote {$quoteId}.");
+        }
+
+        return $quote;
     }
 }
