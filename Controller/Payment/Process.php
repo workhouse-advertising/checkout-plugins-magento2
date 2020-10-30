@@ -3,6 +3,7 @@
 namespace Lmerchant\Checkout\Controller\Payment;
 
 use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
+use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
 
 /**
  * Class Process
@@ -30,7 +31,7 @@ class Process extends \Magento\Framework\App\Action\Action
         \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
         \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
         \Magento\Quote\Model\QuoteValidator $quoteValidator,
-        \Lmerchant\Checkout\Model\Util\Helper $lmerchantHelper,
+        LmerchantHelper $lmerchantHelper,
         \Lmerchant\Checkout\Model\Adapter\PaymentRequest $paymentRequestAdaptor,
         \Lmerchant\Checkout\Logger\Logger $logger
     ) {
@@ -40,9 +41,9 @@ class Process extends \Magento\Framework\App\Action\Action
         $this->_jsonResultFactory = $jsonResultFactory;
         $this->_quoteValidator = $quoteValidator;
 
-        $this->_logger = $logger;
         $this->_lmerchantHelper = $lmerchantHelper;
         $this->_paymentRequestAdaptor = $paymentRequestAdaptor;
+        $this->_logger = $logger;
 
         parent::__construct($context);
     }
@@ -55,7 +56,7 @@ class Process extends \Magento\Framework\App\Action\Action
             $paymentRequest = $this->_processCapture();
 
             $paymentRequest['success'] = true;
-            $paymentRequest['url'] = "https://api.dev.latitudefinancial.com/v1/applybuy-checkout-service/purchase";
+            $paymentRequest['url'] = $this->_lmerchantHelper->getApiUrl(). "/purchase";
 
             $result = $this->_jsonResultFactory->create()->setData($paymentRequest);
 
@@ -69,7 +70,7 @@ class Process extends \Magento\Framework\App\Action\Action
 
     private function _errorResponse(\Exception $exception)
     {
-        $this->logger->error(__METHOD__. $exception->getRawMessage());
+        $this->logger->error(__METHOD__. $exception->getMessage());
 
         $result = $this->jsonResultFactory->create();
         $result->setData(['error' => true, 'message' => __("Could not process request. Check logs for more details")]);

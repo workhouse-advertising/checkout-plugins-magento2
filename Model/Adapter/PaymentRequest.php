@@ -142,16 +142,9 @@ class PaymentRequest
             }
         }
 
-        if ($quote->getShippingAddress()->getShippingAmount()) {
-            $paymentRequest['x_shipping_amount'] = round((float)$quote->getShippingAddress()->getShippingAmount(), $precision);
-        }
-
-        if (isset($additionalData['discount_amount'])) {
-            $paymentRequest['x_discount_amount'] = round((float)$additionalData['discount_amount'], $precision);
-        }
-
-        $taxAmount = array_key_exists('tax_amount', $additionalData) ? $additionalData['tax_amount'] : $shippingAddress->getTaxAmount();
-        $paymentRequest['x_tax_amount'] = isset($taxAmount) ? round((float)$taxAmount, $precision) : 0;
+        $paymentRequest['x_shipping_amount'] = $this->_getShippingAmount($shippingAddress);
+        $paymentRequest['x_tax_amount'] = $this->_getTaxAmount($shippingAddress, $additionalData);
+        $paymentRequest['x_discount_amount'] = $this->_getDiscountAmount($quote, $additionalData);
 
         $paymentGatewayConfig =  $this->_lmerchantHelper->getConfig();
 
@@ -165,5 +158,41 @@ class PaymentRequest
         $paymentRequest['x_signature'] = $this->_lmerchantHelper->getHMAC($paymentRequest);
 
         return $paymentRequest;
+    }
+
+    private function _getShippingAmount($shippingAddress)
+    {
+        if ($shippingAddress->getShippingAmount()) {
+            return round((float)$shippingAddress->getShippingAmount(), 2);
+        }
+
+        return 0;
+    }
+
+    private function _getTaxAmount($shippingAddress, $additionalData)
+    {
+        if (isset($additionalData['tax_amount'])) {
+            return round((float)$additionalData['tax_amount'], 2);
+        }
+
+        if ($shippingAddress->getTaxAmount()) {
+            return round((float)$shippingAddress->getTaxAmount(), 2);
+        }
+
+        return 0;
+    }
+
+    private function _getDiscountAmount($quote, $additionalData)
+    {
+        if (isset($additionalData['discount_amount'])) {
+            return round((float)$additionalData['discount_amount'], 2);
+        }
+
+        if ($quote->getBaseSubtotal() && $quote->getBaseSubtotalWithDiscount()) {
+            $discount = $quote->getBaseSubtotal() - $quote->getBaseSubtotalWithDiscount();
+            return round((float)($discount), 2);
+        }
+
+        return 0;
     }
 }

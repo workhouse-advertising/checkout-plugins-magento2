@@ -26,8 +26,13 @@ class Order
     public function create($quoteId, $gatewayReference, $promotionReference)
     {
         $quote = $this->cartRepository->get($quoteId);
+
+        if (!$quote->getGrandTotal()) {
+            throw new \Exception(__METHOD__. " Cannot process order with zero balance.");
+        }
+
         if (!$quote->getId()) {
-            throw new \Exception(__METHOD__. " Error loading quote {$quoteId}");
+            throw new \Exception(__METHOD__. " Error loading quote {$quoteId}.");
         }
 
         $quote->getPayment()->setMethod(LmerchantConstants::METHOD_CODE);

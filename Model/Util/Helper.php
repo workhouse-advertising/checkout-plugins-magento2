@@ -12,6 +12,12 @@ class Helper
     const MERCHANT_SECRET = 'merchant_secret';
     const TEST_MODE = 'test_mode';
 
+    const API_URL_TEST = 'https://api.dev.latitudefinancial.com/v1/applybuy-checkout-service';
+    const API_URL_PROD = 'https://api.latitudefinancial.com/v1/applybuy-checkout-service';
+
+    const CONTENT_API_URL_TEST = 'https://api.checkout.dev.merchant-services-np.lfscnp.com/content/checkout';
+    const CONTENT_API_URL_PROD = 'https://api.checkout.test.merchant-services-np.lfscnp.com/content/checkout';
+
     protected $scopeConfig;
     protected $state;
     protected $request;
@@ -52,6 +58,16 @@ class Helper
     public function isTestMode()
     {
         return boolval($this->_readConfig(self::TEST_MODE));
+    }
+
+    public function getApiUrl()
+    {
+        return $this->isTestMode() ? self::API_URL_TEST : self::API_URL_PROD;
+    }
+
+    public function getContentApiUrl()
+    {
+        return $this->isTestMode() ? self::CONTENT_API_URL_TEST : self::CONTENT_API_URL_PROD;
     }
 
     public function getHMAC($payload)
