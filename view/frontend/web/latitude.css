@@ -1,0 +1,40 @@
+.latitude-payment-wrapper {
+  padding: 10px 20px;
+  max-width: 500px;
+}
+
+.latitude-payment-wrapper a {
+  font-size: 12px;
+  color: #0046aa;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.latitude-payment-wrapper p {
+  margin: 14px 0;
+}
+
+.latitude-content-small {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.latitude-payment-icon {
+  vertical-align: middle !important;
+  margin-left: 10px;
+  height: 34px;
+  padding: 4px 0;
+  width: auto;
+}
+
+.payment-content-image {
+    height: 65px;
+    width: auto;
+}
+
+.latitude-payment-button {
+  max-width: 450px;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  padding: 14px 17px !important;
+}
