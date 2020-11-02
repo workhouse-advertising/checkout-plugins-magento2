@@ -32,7 +32,7 @@ class Order
 
     public function complete($quoteId, $gatewayReference, $promotionReference)
     {
-        $this->quote = $this->_getQuoteById(quoteId);
+        $this->quote = $this->_getQuoteById($quoteId);
 
         $this->quote->getPayment()->setMethod(LatitudeConstants::METHOD_CODE);
         $this->quote->collectTotals();
