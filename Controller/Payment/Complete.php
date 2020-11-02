@@ -60,6 +60,11 @@ class Complete extends \Magento\Framework\App\Action\Action
                 return;
             }
 
+            if (boolval($quote->getIsActive())) {
+                throw new LocalizedException(__("Could not show success for active quote"));
+                return;
+            }
+
             $this->logger->debug(__METHOD__. " Processing quote and redirecting to success page. Order Id: {$orderId}");
 
             $this->checkoutSession
