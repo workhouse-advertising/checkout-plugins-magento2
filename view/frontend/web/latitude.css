@@ -33,7 +33,7 @@
 }
 
 .latitude-payment-button {
-  max-width: 450px;
+  width: 80%;
   font-size: 18px !important;
   line-height: 1 !important;
   padding: 14px 17px !important;
