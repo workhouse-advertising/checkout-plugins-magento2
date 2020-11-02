@@ -73,7 +73,7 @@ class Complete extends \Magento\Framework\App\Action\Action
             ->setLastOrderId($orderId)
             ->setLastRealOrderId($orderId);
 
-            $this->checkoutSession->setLoadInactive(false);
+            // $this->checkoutSession->setLoadInactive(false);
             $this->checkoutSession->replaceQuote($this->checkoutSession->getQuote()->save());
 
             $this->logger->debug(__METHOD__.

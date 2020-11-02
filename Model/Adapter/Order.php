@@ -40,6 +40,7 @@ class Order
         $this->_setAddtInfo();
 
         $this->quoteValidator->validateBeforeSubmit($this->quote);
+        $this->quote->setIsActive(false);
         $this->quote->save();
         $order = $this->quoteManagement->submit($this->quote);
 
