@@ -1,11 +1,11 @@
 <?php
-namespace Lmerchant\Checkout\Model;
+namespace Latitude\Checkout\Model;
 
-use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
+use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
 class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 {
-    const METHOD_CODE = 'lmerchant';
+    const METHOD_CODE = 'latitude';
     const MINUTE_DELAYED_ORDER = 75;
 
     /**
@@ -23,12 +23,12 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     protected $_canUseInternal = false;
     protected $_canFetchTransactionInfo = true;
 
-    protected $_infoBlockType = 'Lmerchant\Checkout\Block\Info';
+    protected $_infoBlockType = 'Latitude\Checkout\Block\Info';
 
     public function capture($payment, $amount)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->logger = $objectManager->get("\Lmerchant\Checkout\Logger\Logger");
+        $this->logger = $objectManager->get("\Latitude\Checkout\Logger\Logger");
         $this->logger->info(__METHOD__ . " Begin capture for amount: {$amount}");
         $this->_createTransaction($payment, $amount);
         $this->logger->debug(__METHOD__ . " Transaction capture completed");
@@ -38,10 +38,10 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     public function refund($payment, $amount)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->logger = $objectManager->get("\Lmerchant\Checkout\Logger\Logger");
+        $this->logger = $objectManager->get("\Latitude\Checkout\Logger\Logger");
         $this->logger->info(__METHOD__ .
             " Begin refund for Amount: {$amount}".
-            " Sending request to lmerchant refund endpoint: /refund.");
+            " Sending request to latitude refund endpoint: /refund.");
         return $this;
     }
 
@@ -60,7 +60,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
         $info = $payment->getAdditionalInformation();
 
-        $transactionId = $info[LmerchantConstants::GATEWAY_REFERENCE];
+        $transactionId = $info[LatitudeConstants::GATEWAY_REFERENCE];
 
         $payment->setTransactionId($transactionId);
         $payment->setIsTransactionClosed(true);

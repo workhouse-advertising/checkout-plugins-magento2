@@ -1,10 +1,10 @@
 <?php
-namespace Lmerchant\Checkout\Api;
+namespace Latitude\Checkout\Api;
 
 interface CallbackInterface
 {
     /**
-     * POST /v1/lmerchant/callback
+     * POST /v1/latitude/callback
      * @param string $merchantId
      * @param string $amount
      * @param string $currency,

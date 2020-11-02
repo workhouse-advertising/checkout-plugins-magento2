@@ -1,9 +1,9 @@
 <?php
 
-namespace LMerchant\Checkout\Block\Adminhtml\System\Config\Form;
+namespace Latitude\Checkout\Block\Adminhtml\System\Config\Form;
 
 use Magento\Backend\Block\Template\Context;
-use Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
+use Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
 class Version extends \Magento\Config\Block\System\Config\Form\Field
 {
@@ -29,7 +29,7 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
     public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $output = '<div style="background-color:#eee;padding:1em;border:1px solid #ddd;">';
-        $output .= __('Module version') . ': ' . LmerchantConstants::PLUGIN_VERSION;
+        $output .= __('Module version') . ': ' . LatitudeConstants::PLUGIN_VERSION;
         $output .= "</div>";
         return '<div id="row_' . $element->getHtmlId() . '">' . $output . '</div>';
     }

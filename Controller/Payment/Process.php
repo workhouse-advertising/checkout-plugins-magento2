@@ -1,13 +1,13 @@
 <?php
 
-namespace Lmerchant\Checkout\Controller\Payment;
+namespace Latitude\Checkout\Controller\Payment;
 
-use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
-use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
+use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
+use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 
 /**
  * Class Process
- * @package Lmerchant\Checkout\Controller\Payment
+ * @package Latitude\Checkout\Controller\Payment
  */
 class Process extends \Magento\Framework\App\Action\Action
 {
@@ -17,7 +17,7 @@ class Process extends \Magento\Framework\App\Action\Action
     protected $_jsonResultFactory;
     protected $_quoteValidator;
 
-    protected $_lmerchantHelper;
+    protected $_latitudeHelper;
     protected $_paymentRequestAdaptor;
     protected $_logger;
 
@@ -31,9 +31,9 @@ class Process extends \Magento\Framework\App\Action\Action
         \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
         \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
         \Magento\Quote\Model\QuoteValidator $quoteValidator,
-        LmerchantHelper $lmerchantHelper,
-        \Lmerchant\Checkout\Model\Adapter\PaymentRequest $paymentRequestAdaptor,
-        \Lmerchant\Checkout\Logger\Logger $logger
+        LatitudeHelper $latitudeHelper,
+        \Latitude\Checkout\Model\Adapter\PaymentRequest $paymentRequestAdaptor,
+        \Latitude\Checkout\Logger\Logger $logger
     ) {
         $this->_checkoutSession = $checkoutSession;
         $this->_cartRepository = $cartRepository;
@@ -41,7 +41,7 @@ class Process extends \Magento\Framework\App\Action\Action
         $this->_jsonResultFactory = $jsonResultFactory;
         $this->_quoteValidator = $quoteValidator;
 
-        $this->_lmerchantHelper = $lmerchantHelper;
+        $this->_latitudeHelper = $latitudeHelper;
         $this->_paymentRequestAdaptor = $paymentRequestAdaptor;
         $this->_logger = $logger;
 
@@ -56,7 +56,7 @@ class Process extends \Magento\Framework\App\Action\Action
             $paymentRequest = $this->_processCapture();
 
             $paymentRequest['success'] = true;
-            $paymentRequest['url'] = $this->_lmerchantHelper->getApiUrl(). "/purchase";
+            $paymentRequest['url'] = $this->_latitudeHelper->getApiUrl(). "/purchase";
 
             $result = $this->_jsonResultFactory->create()->setData($paymentRequest);
 
@@ -139,7 +139,7 @@ class Process extends \Magento\Framework\App\Action\Action
             $this->_logger->debug(__METHOD__. " cartId:{$cartId}  quoteId:{$quoteId}");
 
             $quote = $this->_cartRepository->get($quoteId);
-            $quote->setCheckoutMethod(LmerchantConstants::METHOD_GUEST);
+            $quote->setCheckoutMethod(LatitudeConstants::METHOD_GUEST);
 
             if (!empty($post['email'])) {
                 $email = htmlspecialchars($post['email'], ENT_QUOTES);
@@ -155,7 +155,7 @@ class Process extends \Magento\Framework\App\Action\Action
 
         $quote->reserveOrderId();
 
-        $quote->getPayment()->setMethod(LmerchantConstants::METHOD_CODE);
+        $quote->getPayment()->setMethod(LatitudeConstants::METHOD_CODE);
 
         $this->_quoteValidator->validateBeforeSubmit($quote);
         $this->_cartRepository->save($quote);

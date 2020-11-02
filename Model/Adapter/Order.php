@@ -1,11 +1,11 @@
 <?php
-namespace Lmerchant\Checkout\Model\Adapter;
+namespace Latitude\Checkout\Model\Adapter;
 
-use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
+use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
 /**
  * Class PaymentRequest
- * @package Lmerchant\Checkout\Model\Adapter
+ * @package Latitude\Checkout\Model\Adapter
  */
 class Order
 {
@@ -27,12 +27,12 @@ class Order
     {
         $quote = $this->_getQuoteById(quoteId);
 
-        $quote->getPayment()->setMethod(LmerchantConstants::METHOD_CODE);
+        $quote->getPayment()->setMethod(LatitudeConstants::METHOD_CODE);
         $payment = $quote->getPayment();
 
-        $payment->setAdditionalInformation(LmerchantConstants::QUOTE_ID, $quoteId);
-        $payment->setAdditionalInformation(LmerchantConstants::GATEWAY_REFERENCE, $gatewayReference);
-        $payment->setAdditionalInformation(LmerchantConstants::PROMOTION_REFERENCE, $promotionReference);
+        $payment->setAdditionalInformation(LatitudeConstants::QUOTE_ID, $quoteId);
+        $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $gatewayReference);
+        $payment->setAdditionalInformation(LatitudeConstants::PROMOTION_REFERENCE, $promotionReference);
         
         $info = $payment->getAdditionalInformation();
         $quote->setPayment($payment);
@@ -46,7 +46,7 @@ class Order
 
     public function addError($quoteId, $message)
     {
-        $quote = $this->_getQuoteById(quoteId)->addErrorInfo('error', 'Lmerchant_Checkout', 1, $message, null);
+        $quote = $this->_getQuoteById(quoteId)->addErrorInfo('error', 'Latitude_Checkout', 1, $message, null);
     }
 
     private function _getQuoteById($quoteId)

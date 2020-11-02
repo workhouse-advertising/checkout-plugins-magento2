@@ -1,18 +1,18 @@
 <?php
-namespace Lmerchant\Checkout\Model\Adapter;
+namespace Latitude\Checkout\Model\Adapter;
 
-use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
-use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
+use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
+use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 
 /**
  * Class PaymentRequest
- * @package Lmerchant\Checkout\Model\Adapter
+ * @package Latitude\Checkout\Model\Adapter
  */
 class PaymentRequest
 {
     protected $_storeManagerInterface;
     protected $_productRepositoryInterface;
-    protected $_lmerchantHelper;
+    protected $_latitudeHelper;
 
     /**
      * PaymentRequest constructor.
@@ -22,11 +22,11 @@ class PaymentRequest
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryInterface,
-        LmerchantHelper $lmerchantHelper
+        LatitudeHelper $latitudeHelper
     ) {
         $this->_storeManagerInterface = $storeManagerInterface;
         $this->_productRepositoryInterface = $productRepositoryInterface;
-        $this->_lmerchantHelper = $lmerchantHelper;
+        $this->_latitudeHelper = $latitudeHelper;
     }
 
     /**
@@ -98,9 +98,9 @@ class PaymentRequest
         
         $paymentRequest['x_merchant_reference'] = isset($quoteId) ? $quoteId : $quote->getIncrementId();
 
-        $paymentRequest['x_url_cancel'] = $baseUrl . LmerchantConstants::CANCEL_ROUTE;
-        $paymentRequest['x_url_callback'] = $baseUrl . LmerchantConstants::CALLBACK_ROUTE;
-        $paymentRequest['x_url_complete'] = $baseUrl . LmerchantConstants::COMPLETE_ROUTE . "?reference={$quoteId}";
+        $paymentRequest['x_url_cancel'] = $baseUrl . LatitudeConstants::CANCEL_ROUTE;
+        $paymentRequest['x_url_callback'] = $baseUrl . LatitudeConstants::CALLBACK_ROUTE;
+        $paymentRequest['x_url_complete'] = $baseUrl . LatitudeConstants::COMPLETE_ROUTE . "?reference={$quoteId}";
 
         if (!empty($shippingAddress) && !empty($shippingAddress->getStreetLine(1))) {
             $paymentRequest['x_shipping_name'] = (string)$shippingAddress->getFirstname() . ' ' . $shippingAddress->getLastname();
@@ -146,16 +146,16 @@ class PaymentRequest
         $paymentRequest['x_tax_amount'] = $this->_getTaxAmount($shippingAddress, $additionalData);
         $paymentRequest['x_discount_amount'] = $this->_getDiscountAmount($quote, $additionalData);
 
-        $paymentGatewayConfig =  $this->_lmerchantHelper->getConfig();
+        $paymentGatewayConfig =  $this->_latitudeHelper->getConfig();
 
-        $paymentRequest['x_merchant_id'] = $paymentGatewayConfig[LmerchantHelper::MERCHANT_ID];
-        $paymentRequest['x_test'] = $paymentGatewayConfig[LmerchantHelper::TEST_MODE] ? "true" : "false";
+        $paymentRequest['x_merchant_id'] = $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID];
+        $paymentRequest['x_test'] = $paymentGatewayConfig[LatitudeHelper::TEST_MODE] ? "true" : "false";
 
-        $paymentRequest['x_platform_type'] = LmerchantConstants::PLATFORM_TYPE;
-        $paymentRequest['x_platform_version'] =$this->_lmerchantHelper->getPlatformVersion();
-        $paymentRequest['x_plugin_version'] = LmerchantConstants::PLUGIN_VERSION;
+        $paymentRequest['x_platform_type'] = LatitudeConstants::PLATFORM_TYPE;
+        $paymentRequest['x_platform_version'] =$this->_latitudeHelper->getPlatformVersion();
+        $paymentRequest['x_plugin_version'] = LatitudeConstants::PLUGIN_VERSION;
 
-        $paymentRequest['x_signature'] = $this->_lmerchantHelper->getHMAC($paymentRequest);
+        $paymentRequest['x_signature'] = $this->_latitudeHelper->getHMAC($paymentRequest);
 
         return $paymentRequest;
     }

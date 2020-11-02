@@ -1,13 +1,13 @@
 <?php
 
-namespace Lmerchant\Checkout\Controller\Payment;
+namespace Latitude\Checkout\Controller\Payment;
 
 use \Magento\Framework\Exception\LocalizedException as LocalizedException;
-use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
+use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
 /**
  * Class Complete
- * @package Lmerchant\Checkout\Controller\Complete
+ * @package Latitude\Checkout\Controller\Complete
  */
 class Complete extends \Magento\Framework\App\Action\Action
 {
@@ -27,7 +27,7 @@ class Complete extends \Magento\Framework\App\Action\Action
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         \Magento\Quote\Model\QuoteValidator $quoteValidator,
-        \Lmerchant\Checkout\Logger\Logger $logger
+        \Latitude\Checkout\Logger\Logger $logger
     ) {
         $this->messageManager = $messageManager;
         $this->checkoutSession = $checkoutSession;

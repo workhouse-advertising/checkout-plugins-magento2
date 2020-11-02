@@ -1,4 +1,4 @@
-# lmerchant-checkout
+# latitude-checkout
 
 Demo checkout module for Magneto 2
 
@@ -10,12 +10,12 @@ Demo checkout module for Magneto 2
     cd /var/www/html/magento
 ```
 
-### Configure Lmerchant checkout module
+### Configure Latitude checkout module
 
 ```sh
     # add -vvv for verbose mode
-    composer require lmerchant/module-checkout  # new installation
-    composer update lmerchant/module-checkout   # update existing installation
+    composer require latitude/checkout  # new installation
+    composer update latitude/checkout   # update existing installation
 ```
 
 ### Upgrade your store instance 
@@ -39,10 +39,10 @@ Demo checkout module for Magneto 2
 
 ## Enable payment method
 
-> Before proceeding with next steps, make sure that you have credentials to use Lmerchant Checkout.
+> Before proceeding with next steps, make sure that you have credentials to use Latitude Checkout.
 
 
-1. Navigate to Magento Admin > Stores > Configuration > Sales > Payment Methods> Lmerchant
+1. Navigate to Magento Admin > Stores > Configuration > Sales > Payment Methods> Latitude
 
 1. Enter the Merchant ID and Secret Key
 

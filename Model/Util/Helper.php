@@ -1,9 +1,9 @@
 <?php
-namespace Lmerchant\Checkout\Model\Util;
+namespace Latitude\Checkout\Model\Util;
 
 /**
  * Class Helper
- * @package Lmerchant\Checkout\Model\Util
+ * @package Latitude\Checkout\Model\Util
  */
 class Helper
 {
@@ -107,7 +107,7 @@ class Helper
     private function _readConfig($path, $returnRaw = false)
     {
         $websiteId = $this->getWebsiteId();
-        $rootNode = 'payment/' . \Lmerchant\Checkout\Model\Payment::METHOD_CODE;
+        $rootNode = 'payment/' . \Latitude\Checkout\Model\Payment::METHOD_CODE;
     
         if (!empty($websiteId) && $websiteId) {
             $val = $this->scopeConfig->getValue($rootNode . '/' . $path, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES, $websiteId);

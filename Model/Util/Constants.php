@@ -1,5 +1,5 @@
 <?php
-namespace Lmerchant\Checkout\Model\Util;
+namespace Latitude\Checkout\Model\Util;
 
 class Constants
 {
@@ -7,14 +7,14 @@ class Constants
     const PLUGIN_VERSION = "0.0.2";
 
     const METHOD_GUEST = 'guest';
-    const METHOD_CODE = 'lmerchant';
+    const METHOD_CODE = 'latitude';
 
     const EVENT_COMPLETED = 'latitude_order_completed';
     const EVENT_FAILED = 'latitude_order_failed';
 
-    const CALLBACK_ROUTE = 'rest/V1/lmerchant/callback';
+    const CALLBACK_ROUTE = 'rest/V1/latitude/callback';
     const CANCEL_ROUTE = 'checkout/cart';
-    const COMPLETE_ROUTE = 'lmerchant/payment/complete';
+    const COMPLETE_ROUTE = 'latitude/payment/complete';
 
     const QUOTE_ID= 'quote_id';
     const GATEWAY_REFERENCE = 'gateway_reference';

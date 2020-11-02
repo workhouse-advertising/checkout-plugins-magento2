@@ -9,11 +9,11 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="lmerchant_config_provider" xsi:type="object">Lmerchant\Checkout\Model\Ui\ConfigProvider</item>
+                <item name="latitude_config_provider" xsi:type="object">Latitude\Checkout\Model\Ui\ConfigProvider</item>
             </argument>
         </arguments>
     </type>
-    <type name="Lmerchant\Checkout\Block\Info">
+    <type name="Latitude\Checkout\Block\Info">
         <arguments>
             <argument name="data" xsi:type="array">
                 <item xsi:type="string" name="is_secure_mode">1</item>

@@ -16,7 +16,7 @@ define([
 
   return Component.extend({
     defaults: {
-      template: "Lmerchant_Checkout/payment/form",
+      template: "Latitude_Checkout/payment/form",
       transactionResult: "",
     },
 
@@ -26,7 +26,7 @@ define([
     },
 
     getCode: function () {
-      return "lmerchant";
+      return "latitude";
     },
 
     getData: function () {
@@ -40,7 +40,7 @@ define([
 
     getTransactionResults: function () {
       return _.map(
-        window.checkoutConfig.payment.lmerchant.transactionResults,
+        window.checkoutConfig.payment.latitude.transactionResults,
         function (value, key) {
           return {
             value: key,
@@ -51,7 +51,7 @@ define([
     },
 
     completeOrder: function () {
-      var url = mageUrl.build("lmerchant/payment/process");
+      var url = mageUrl.build("latitude/payment/process");
       var data = $("#co-shipping-form").serialize();
       var email = window.checkoutConfig.customerData.email;
 

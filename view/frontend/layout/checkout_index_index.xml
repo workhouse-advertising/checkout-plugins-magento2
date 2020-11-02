@@ -23,10 +23,10 @@
                                                         <item name="renders" xsi:type="array">
                                                             <!-- merge payment method renders here -->
                                                             <item name="children" xsi:type="array">
-                                                                <item name="lmerchant" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">Lmerchant_Checkout/js/view/payment/lmerchant</item>
+                                                                <item name="latitude" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Latitude_Checkout/js/view/payment/latitude</item>
                                                                     <item name="methods" xsi:type="array">
-                                                                        <item name="lmerchant" xsi:type="array">
+                                                                        <item name="latitude" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                     </item>

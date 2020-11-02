@@ -1,5 +1,5 @@
 <?php
-namespace Lmerchant\Checkout\Logger;
+namespace Latitude\Checkout\Logger;
 
 use Monolog\Logger as MonoLogger;
 

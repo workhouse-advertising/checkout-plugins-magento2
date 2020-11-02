@@ -3,7 +3,7 @@
  * Copyright © 2016 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
-namespace Lmerchant\Checkout\Model\Ui;
+namespace Latitude\Checkout\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 
@@ -12,7 +12,7 @@ use Magento\Checkout\Model\ConfigProviderInterface;
  */
 final class ConfigProvider implements ConfigProviderInterface
 {
-    const CODE = 'lmerchant';
+    const CODE = 'latitude';
 
     /**
      * Retrieve assoc array of checkout configuration

@@ -1,8 +1,8 @@
 <?php
-namespace Lmerchant\Checkout\Api;
+namespace Latitude\Checkout\Api;
 
-use \Lmerchant\Checkout\Model\Util\Constants as LmerchantConstants;
-use \Lmerchant\Checkout\Model\Util\Helper as LmerchantHelper;
+use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
+use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 
 class Callback
 {
@@ -13,7 +13,7 @@ class Callback
 
     protected $logger;
     protected $orderAdapter;
-    protected $lmerchantHelper;
+    protected $latitudeHelper;
 
     const ORDER_ID = 'order_id';
     const MERCHANT_ID = 'merchant_id';
@@ -34,9 +34,9 @@ class Callback
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
         \Magento\Framework\Event\ManagerInterface $eventManager,
-        \Lmerchant\Checkout\Logger\Logger $logger,
-        \Lmerchant\Checkout\Model\Adapter\Order $orderAdapter,
-        LmerchantHelper $lmerchantHelper
+        \Latitude\Checkout\Logger\Logger $logger,
+        \Latitude\Checkout\Model\Adapter\Order $orderAdapter,
+        LatitudeHelper $latitudeHelper
     ) {
         $this->request = $request;
         $this->jsonHelper = $jsonHelper;
@@ -45,7 +45,7 @@ class Callback
 
         $this->logger = $logger;
         $this->orderAdapter = $orderAdapter;
-        $this->lmerchantHelper = $lmerchantHelper;
+        $this->latitudeHelper = $latitudeHelper;
     }
 
     /**
@@ -85,7 +85,7 @@ class Callback
                 throw new \Exception(__("Could not Validate Request"));
             }
 
-            if ($post[self::RESULT] == LmerchantConstants::TRANSACTION_RESULT_FAILED) {
+            if ($post[self::RESULT] == LatitudeConstants::TRANSACTION_RESULT_FAILED) {
                 $this->orderAdapter->addError($post[self::MERCHANT_REFERENCE], "Order failed with message ". $post[self::MESSAGE]);
                 $this->_dispatch($post, false);
                 return $gatewayReference;
@@ -117,34 +117,34 @@ class Callback
 
     private function _validateRequest($post, $signature)
     {
-        if (empty($signature) || $signature != $this->lmerchantHelper->getHMAC($post)) {
+        if (empty($signature) || $signature != $this->latitudeHelper->getHMAC($post)) {
             $this->logger->debug(__METHOD__. " actual: ". $signature);
-            $this->logger->debug(__METHOD__. " expected: ". $this->lmerchantHelper->getHMAC($post));
+            $this->logger->debug(__METHOD__. " expected: ". $this->latitudeHelper->getHMAC($post));
             $this->logger->error(__METHOD__. " Could not verify HMAC");
             return false;
         }
 
-        $paymentGatewayConfig = $this->lmerchantHelper->getConfig();
-        if ($post[self::MERCHANT_ID] != $paymentGatewayConfig[LmerchantHelper::MERCHANT_ID]) {
+        $paymentGatewayConfig = $this->latitudeHelper->getConfig();
+        if ($post[self::MERCHANT_ID] != $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID]) {
             $this->logger->error(__METHOD__. " Unexpected merchant id ". $post[self::MERCHANT_ID]);
             return false;
         }
 
-        if (!in_array($post[self::CURRENCY], LmerchantConstants::ALLOWED_CURRENCY)) {
+        if (!in_array($post[self::CURRENCY], LatitudeConstants::ALLOWED_CURRENCY)) {
             $this->logger->error(__METHOD__. " Unsupported currency");
             return false;
         }
         
         if (!in_array($post[self::RESULT], array(
-                LmerchantConstants::TRANSACTION_RESULT_COMPLETED,
-                LmerchantConstants::TRANSACTION_RESULT_FAILED
+                LatitudeConstants::TRANSACTION_RESULT_COMPLETED,
+                LatitudeConstants::TRANSACTION_RESULT_FAILED
             ))) {
             $this->logger->error(__METHOD__. " Unsupported result");
             return false;
         }
 
         if (!in_array($post[self::TRANSACTION_TYPE], array(
-                LmerchantConstants::TRANSACTION_TYPE_SALE
+                LatitudeConstants::TRANSACTION_TYPE_SALE
             ))) {
             $this->logger->error(__METHOD__. " Unsupported transaction type");
             return false;
@@ -156,7 +156,7 @@ class Callback
     private function _dispatch($post, $isCompleted)
     {
         $this->eventManager->dispatch(
-            $isCompleted ? LmerchantConstants::EVENT_COMPLETED : LmerchantConstants::EVENT_FAILED,
+            $isCompleted ? LatitudeConstants::EVENT_COMPLETED : LatitudeConstants::EVENT_FAILED,
             [
                 'quote' => $post[self::MERCHANT_REFERENCE],
                 'merchant_reference' => $post[self::GATEWAY_REFERENCE],

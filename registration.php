@@ -6,6 +6,6 @@
 
 \Magento\Framework\Component\ComponentRegistrar::register(
     \Magento\Framework\Component\ComponentRegistrar::MODULE,
-    'Lmerchant_Checkout',
+    'Latitude_Checkout',
     __DIR__
 );

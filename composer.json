@@ -1,10 +1,10 @@
 {
-  "name": "lmerchant/module-checkout",
-  "description": "Demo payment gateway integration",
+  "name": "latitude/checkout",
+  "description": "Payment gateway integration for Latitude Interest Free products",
   "authors": [
     {
-      "name": "Lmerchant",
-      "homepage": "https://www.lmerchant.com"
+      "name": "Latitude",
+      "homepage": "https://checkout.latitudefinancial.com"
     }
   ],
   "type": "magento2-module",
@@ -18,7 +18,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "Lmerchant\\Checkout\\": ""
+      "Latitude\\Checkout\\": ""
     }
   }
 }
