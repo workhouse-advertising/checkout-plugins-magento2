@@ -91,7 +91,7 @@ class Callback
                 return $gatewayReference;
             }
 
-            $orderId = $this->orderAdapter->create(
+            $orderId = $this->orderAdapter->complete(
                 $post[self::MERCHANT_REFERENCE],
                 $post[self::GATEWAY_REFERENCE],
                 $post[self::PROMOTION_REFERENCE]
