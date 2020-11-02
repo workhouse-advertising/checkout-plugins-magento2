@@ -25,6 +25,19 @@ define([
       return "latitude";
     },
 
+    getLogoURL: function () {
+      return window.checkoutConfig.payment.latitude.logoURL;
+    },
+
+    getTermsURL: function () {
+      return window.checkoutConfig.payment.latitude.termsURL;
+    },
+
+    getContent: function () {
+      console.log({ data: window.checkoutConfig.payment.latitude.content });
+      return window.checkoutConfig.payment.latitude.content;
+    },
+
     getData: function () {
       return {
         method: this.item.method,
@@ -125,10 +138,11 @@ define([
             return;
           }
         })
-        .fail(function (xhr, status ) {
-          console.error("request failed with status " + status); 
+        .fail(function (xhr, status) {
+          console.error("request failed with status " + status);
           globalMessageList.addErrorMessage({
-            message: "We could not process this request at this time, please try again or select other payment method",
+            message:
+              "We could not process this request at this time, please try again or select other payment method",
           });
         })
         .always(function () {

@@ -4,7 +4,7 @@ namespace Latitude\Checkout\Model\Util;
 class Constants
 {
     const PLATFORM_TYPE = "magento";
-    const PLUGIN_VERSION = "0.0.2";
+    const PLUGIN_VERSION = "0.1.1";
 
     const METHOD_GUEST = 'guest';
     const METHOD_CODE = 'latitude';
