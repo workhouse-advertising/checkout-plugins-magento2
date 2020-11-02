@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd"
+    >
+    <type name="Latitude\Checkout\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">Latitude</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Latitude\Checkout\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference 
+        for="Latitude\Checkout\Api\CallbackInterface" 
+        type="Latitude\Checkout\Api\Callback" 
+        />
+</config>

@@ -1,0 +1,54 @@
+<div
+  class="payment-method"
+  data-bind="css: {'_active': (getCode() == isChecked())}"
+>
+  <div class="payment-method-title field choice">
+    <input
+      type="radio"
+      name="payment[method]"
+      class="radio"
+      data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"
+    />
+    <label data-bind="attr: {'for': getCode()}" class="label">
+      <img
+        src="https://assets.latitudefinancial.com/merchant-services/latitude/icon/latitude-interest-free.svg"
+        class="payment-icon"
+        alt="Latitude"
+        style="margin-left: 10px"
+        height="60"
+      />
+    </label>
+  </div>
+
+  <div class="payment-method-content">
+    <div
+      class="instalment-footer"
+      style="background: #f0f0f0; padding: 10px 20px"
+    >
+      <p><strong>Interest free. Always!</strong></p>
+      <br />
+      <p>
+        You will be redirected to Latitude to complete your purchase securely
+      </p>
+      <p>
+        By continuing, you agree to our
+        <a href="https://latitude.com">Terms and conditions</a>
+      </p>
+      <br />
+      <button
+        class="action primary checkout"
+        type="submit"
+        data-bind="click: completeOrder, enable: (getCode() == isChecked())"
+        style="
+          font-size: 1.8rem;
+          line-height: 2.2rem;
+          padding: 14px 17px;
+          width: 100%;
+        "
+        disabled
+      >
+        Complete order
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="latitude" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Latitude</label>
+
+                <comment><![CDATA[<img class="logo" src="https://assets.latitudefinancial.com/merchant-services/latitude/icon/lfs_logo.png" height="80"/><p><a href="https://checkout.latitudefinancial.com" target="_blank">Learn more</a></p>]]></comment>
+                <attribute type="expanded">1</attribute>
+
+                <field id="version" type="text" translate="label comment" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Latitude\Checkout\Block\Adminhtml\System\Config\Form\Version</frontend_model>
+                </field>
+                <field id="active" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Is Active ?</label>
+                    <config_path>payment/latitude/active</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="merchant_id" translate="label" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Merchant ID</label>
+                    <config_path>payment/latitude/merchant_id</config_path>
+                </field>
+                <field id="merchant_secret" translate="label" type="obscure" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Secret Key</label>
+                    <config_path>payment/latitude/merchant_secret</config_path>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Is Test Mode ?</label>
+                    <config_path>payment/latitude/test_mode</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

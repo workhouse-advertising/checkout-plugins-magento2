@@ -1,0 +1,24 @@
+{
+  "name": "latitude/checkout",
+  "description": "Payment gateway integration for Latitude Interest Free products",
+  "authors": [
+    {
+      "name": "Latitude",
+      "homepage": "https://checkout.latitudefinancial.com"
+    }
+  ],
+  "type": "magento2-module",
+  "version": "0.0.2",
+  "license": [
+    "OSL-3.0",
+    "AFL-3.0"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Latitude\\Checkout\\": ""
+    }
+  }
+}
