@@ -63,7 +63,7 @@ class Order
 
     public function addError($quoteId, $message)
     {
-        $this->_getQuoteById(quoteId)->addErrorInfo('error', 'Latitude_Checkout', 1, $message, null)->save();
+        $this->_getQuoteById($quoteId)->addErrorInfo('error', 'Latitude_Checkout', 1, $message, null)->save();
     }
 
     private function _getQuoteById($quoteId)
