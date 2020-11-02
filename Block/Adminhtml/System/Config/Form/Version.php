@@ -28,7 +28,7 @@ class Version extends \Magento\Config\Block\System\Config\Form\Field
      */
     public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-        $output = '<div style="background-color:#eee;padding:1em;border:1px solid #ddd;">';
+        $output = '<div style="background-color:#eee; margin:20px 0;padding:10px 15px; border:1px solid #ddd;">';
         $output .= __('Module version') . ': ' . LatitudeConstants::PLUGIN_VERSION;
         $output .= "</div>";
         return '<div id="row_' . $element->getHtmlId() . '">' . $output . '</div>';

@@ -9,9 +9,9 @@
     <system>
         <section id="payment">
             <group id="latitude" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                 <label>Latitude</label>
+                <label>Latitude</label>
 
-                <comment><![CDATA[<p>Interest-free and other payment options by Latitude. <a href="https://www.latitudefinancial.com.au" target="_blank">Click here to know more</a></p><img class="logo" src="https://dvh1deh6tagwk.cloudfront.net/niche-builder/5d5de04c57373.png" height="80"/>]]></comment>
+                <comment><![CDATA[<img class="logo" src="https://assets.latitudefinancial.com/merchant-services/latitude/icon/lfs_logo.png" height="80"/><p><a href="https://checkout.latitudefinancial.com" target="_blank">Learn more</a></p>]]></comment>
                 <attribute type="expanded">1</attribute>
 
                 <field id="version" type="text" translate="label comment" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
