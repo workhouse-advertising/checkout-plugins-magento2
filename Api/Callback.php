@@ -1,6 +1,7 @@
 <?php
 namespace Latitude\Checkout\Api;
 
+use \Magento\Framework\Exception as Exception;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 
@@ -82,7 +83,7 @@ class Callback
 
         try {
             if (!$this->_validateRequest($post, $signature)) {
-                throw new \Exception(__("Could not Validate Request"));
+                throw new Exception(__("Could not Validate Request"));
             }
 
             if ($post[self::RESULT] == LatitudeConstants::TRANSACTION_RESULT_FAILED) {
@@ -101,7 +102,7 @@ class Callback
             $this->_dispatch($post, true);
 
             return $orderId;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (preg_match('/Invalid state change requested/i', $e->getMessage())) {
                 $this->logger->debug(__METHOD__. " Ignored: Invalid state change requested ");
                 return $gatewayReference;
@@ -109,7 +110,7 @@ class Callback
 
             $this->logger->error(__METHOD__. " ". $e->getMessage());
             throw new \Magento\Framework\Webapi\Exception(__('Bad Request'), 400);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error(__METHOD__. " ". $e->getMessage());
             throw new \Magento\Framework\Webapi\Exception(__('Bad Request'), 400);
         }
