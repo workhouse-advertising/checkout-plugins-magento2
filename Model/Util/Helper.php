@@ -14,7 +14,7 @@ class Helper
     const MERCHANT_SECRET = 'merchant_secret';
     const TEST_MODE = 'test_mode';
 
-    const API_URL_TEST = 'https://api.dev.latitudefinancial.com/v1/applybuy-checkout-service';
+    const API_URL_TEST = 'https://api.test.latitudefinancial.com/v1/applybuy-checkout-service';
     const API_URL_PROD = 'https://api.latitudefinancial.com/v1/applybuy-checkout-service';
 
     const CONTENT_API_URL_TEST = 'https://api.checkout.dev.merchant-services-np.lfscnp.com/content/checkout';
