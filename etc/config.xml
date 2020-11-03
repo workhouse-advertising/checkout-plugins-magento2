@@ -8,13 +8,13 @@
                 <merchant_id />
                 <merchant_secret backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <test_mode>1</test_mode>
-                <order_status>processing</order_status>
-                <payment_action>capture</payment_action>
-                <title>Latitude</title>
+                <order_status>pending</order_status>
+                <payment_action>authorize_capture</payment_action>
+                <title>Latitude Interest Free</title>
                 <currency>AUD</currency>
-                <can_authorize>0</can_authorize>
+                <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
-                <can_void>0</can_void>
+                <can_void>1</can_void>
                 <can_use_checkout>1</can_use_checkout>
                 <is_gateway>1</is_gateway>
             </latitude>

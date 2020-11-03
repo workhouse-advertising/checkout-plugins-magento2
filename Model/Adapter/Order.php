@@ -15,7 +15,6 @@ class Order
     protected $orderRespository;
     protected $emailSender;
     protected $checkoutSession;
-    protected $quote;
 
     public function __construct(
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
@@ -35,28 +34,26 @@ class Order
 
     public function complete($quoteId, $gatewayReference, $promotionReference)
     {
-        $this->quote = $this->_getQuoteById($quoteId);
+        $quote = $this->_getQuoteById($quoteId);
 
         // Set payment method
-        $this->quote->getPayment()->setMethod(LatitudeConstants::METHOD_CODE);
-        $this->quote->collectTotals();
-        $this->_prepareQuote();
+        $quote->getPayment()->setMethod(LatitudeConstants::METHOD_CODE);
 
         // Set payment details
-        $payment = $this->quote->getPayment();
+        $payment = $quote->getPayment();
         $payment->setAdditionalInformation(LatitudeConstants::QUOTE_ID, $quoteId);
         $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $gatewayReference);
         $payment->setAdditionalInformation(LatitudeConstants::PROMOTION_REFERENCE, $promotionReference);
-        $this->quote->setPayment($payment);
+        $payment->save();
+
+        // validate for errors
+        $this->quoteValidator->validateBeforeSubmit($quote);
 
         // Save quote
-        $this->quoteValidator->validateBeforeSubmit($this->quote);
-        $payment->save();
-        $this->quote->save();
-
+        $quote->save();
+        
         // Convert to order
-        $orderId = $this->quoteManagement->placeOrder($quoteId);
-        $order = $this->orderRespository->get($orderId);
+        $order = $this->quoteManagement->submit($quote);
 
         switch ($order->getState()) {
             // handle auth/capture exceptions caused by paypal or bank capture
@@ -67,13 +64,12 @@ class Order
             case \Magento\Sales\Model\Order::STATE_COMPLETE:
             case \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW:
                 $this->emailSender->send(($order));
-                $this->checkoutSession->start();
                 break;
             default:
                 break;
         }
 
-        return $orderId;
+        return $order->getId();
     }
 
     public function addError($quoteId, $message)
@@ -98,21 +94,5 @@ class Order
         }
 
         return $quote;
-    }
-
-    private function _prepareQuote()
-    {
-        $quote = $this->quote;
-
-        $this->quote->getBillingAddress()->setShouldIgnoreValidation(true);
-
-        if ($quote->getCheckoutMethod() != \Magento\Checkout\Model\Type\Onepage::METHOD_GUEST) {
-            return;
-        }
-
-        $this->quote->setCustomerId(null)
-            ->setCustomerEmail($quote->getBillingAddress()->getEmail())
-            ->setCustomerIsGuest(true)
-            ->setCustomerGroupId(\Magento\Customer\Model\Group::NOT_LOGGED_IN_ID);
     }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace Latitude\Checkout\Model\Util;
 
+use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
+
 /**
  * Class Helper
  * @package Latitude\Checkout\Model\Util
@@ -107,7 +109,7 @@ class Helper
     private function _readConfig($path, $returnRaw = false)
     {
         $websiteId = $this->getWebsiteId();
-        $rootNode = 'payment/' . \Latitude\Checkout\Model\Payment::METHOD_CODE;
+        $rootNode = 'payment/' . LatitudeConstants::METHOD_CODE;
     
         if (!empty($websiteId) && $websiteId) {
             $val = $this->scopeConfig->getValue($rootNode . '/' . $path, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES, $websiteId);

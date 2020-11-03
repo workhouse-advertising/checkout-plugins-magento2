@@ -5,13 +5,12 @@ use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
 class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 {
-    const METHOD_CODE = 'latitude';
     const MINUTE_DELAYED_ORDER = 75;
 
     /**
      * @var string
      */
-    protected $_code = self::METHOD_CODE;
+    protected $_code = LatitudeConstants::METHOD_CODE;
 
     protected $_isGateway = true;
     protected $_isInitializeNeeded = false;
@@ -27,22 +26,22 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     public function capture($payment, $amount)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->logger = $objectManager->get("\Latitude\Checkout\Logger\Logger");
-        $this->logger->info(__METHOD__ . " Begin capture for amount: {$amount}");
+        $this->_getLogger()->info(__METHOD__ . " Begin capture for amount: {$amount}");
         $this->_createTransaction($payment, $amount);
-        $this->logger->debug(__METHOD__ . " Transaction capture completed");
+        $this->_getLogger()->debug(__METHOD__ . " Transaction capture completed");
         return $this;
     }
 
     public function refund($payment, $amount)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->logger = $objectManager->get("\Latitude\Checkout\Logger\Logger");
-        $this->logger->info(__METHOD__ .
+        $this->_getLogger()->info(__METHOD__ .
             " Begin refund for Amount: {$amount}".
             " Sending request to latitude refund endpoint: /refund.");
-        return $this;
+
+        // TODO: send request to refund endpoint
+        throw new \Magento\Framework\Exception\LocalizedException(
+            __('Could not process refund')
+        );
     }
 
     private function _createTransaction($payment, $amount)
@@ -71,5 +70,11 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
         unset($info['merchant']);
 
         $payment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $info);
+    }
+
+    private function _getLogger()
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        return $objectManager->get("\Latitude\Checkout\Logger\Logger");
     }
 }
