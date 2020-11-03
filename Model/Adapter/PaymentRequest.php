@@ -62,7 +62,7 @@ class PaymentRequest
         }
         
         if (count($errors)) {
-            throw new \Exception(__(implode($errors, ' ; ')));
+            throw new Exception(__(implode($errors, ' ; ')));
         } else {
             return true;
         }

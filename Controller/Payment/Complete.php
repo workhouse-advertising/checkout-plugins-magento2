@@ -2,6 +2,7 @@
 
 namespace Latitude\Checkout\Controller\Payment;
 
+use \Magento\Framework\Exception as Exception;
 use \Magento\Framework\Exception\LocalizedException as LocalizedException;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
@@ -94,14 +95,14 @@ class Complete extends \Magento\Framework\App\Action\Action
                 'mage_order_id' => $orderId
             ]);
             return;
-        } catch (\Magento\Framework\Exception\LocalizedException $locallizedException) {
+        } catch (LocalizedException $locallizedException) {
             return $this->_processError($locallizedException);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->_processError($exception);
         }
     }
 
-    private function _processError(\Exception $exception)
+    private function _processError(Exception $exception)
     {
         $this->logger->error(__METHOD__. " ". $exception->getRawMessage());
         $this->messageManager->addErrorMessage("Your payment was not successful, please try again or select other payment method");

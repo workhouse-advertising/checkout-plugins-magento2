@@ -2,6 +2,9 @@
 
 namespace Latitude\Checkout\Controller\Payment;
 
+use \Magento\Framework\Exception as Exception;
+use \Magento\Framework\Exception\LocalizedException as LocalizedException;
+
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 
@@ -61,14 +64,14 @@ class Process extends \Magento\Framework\App\Action\Action
             $result = $this->_jsonResultFactory->create()->setData($paymentRequest);
 
             return $result;
-        } catch (\Magento\Framework\Exception\LocalizedException $locallizedException) {
+        } catch (LocalizedException $locallizedException) {
             return $this->_processError($locallizedException);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->_processError($exception);
         }
     }
 
-    private function _errorResponse(\Exception $e)
+    private function _errorResponse(Exception $e)
     {
         $this->logger->error(__METHOD__. $e->getMessage());
 
@@ -86,7 +89,7 @@ class Process extends \Magento\Framework\App\Action\Action
         $cartId = htmlspecialchars($post['cartId'], ENT_QUOTES);
 
         if (empty($cartId)) {
-            throw new \Exception(__("Invalid request"));
+            throw new Exception(__("Invalid request"));
         }
 
         $data = $this->_checkoutSession->getData();
@@ -121,7 +124,7 @@ class Process extends \Magento\Framework\App\Action\Action
                     $address = $objectManager->create('Magento\Customer\Model\Address')->load($billingID);
                     $billingAddress->addData($address->getData());
                 } else {
-                    throw new \Exception(__("Invalid billing address"));
+                    throw new Exception(__("Invalid billing address"));
                 }
             } elseif (empty($billingAddress) || empty($billingAddress->getStreetLine(1)) || empty($billingAddress->getFirstname())) {
                 $billingAddress = $quote->getShippingAddress();

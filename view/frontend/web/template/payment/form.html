@@ -21,7 +21,9 @@
   <div class="payment-method-content latitude-payment-wrapper">
     <p>
       <strong data-bind="text: getContent().title"></strong>
-      <a data-bind="attr: {href: getContent().applyURL}">Learn more</a>
+      <a target="_blank" data-bind="attr: {href: getContent().applyURL}"
+        >Learn more</a
+      >
     </p>
 
     <p data-bind="text: getContent().heading"></p>
@@ -55,12 +57,16 @@
 
     <p class="latitude-content-small">
       <span data-bind="text: getContent().applyText"></span>
-      <a data-bind="attr: {href: getContent().applyURL}">Apply here</a>
+      <a target="_blank" data-bind="attr: {href: getContent().applyURL}"
+        >Apply here</a
+      >
     </p>
 
     <p class="latitude-content-small">
       By continuing, you agree to our
-      <a data-bind="attr: {href: getTermsURL()}">Terms and conditions</a>
+      <a target="_blank" data-bind="attr: {href: getTermsURL()}"
+        >Terms and conditions</a
+      >
     </p>
   </div>
 </div>

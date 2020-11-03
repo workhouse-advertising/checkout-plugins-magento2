@@ -1,6 +1,7 @@
 <?php
 namespace Latitude\Checkout\Model\Adapter;
 
+use \Magento\Framework\Exception as Exception;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
 /**
@@ -51,7 +52,7 @@ class Order
 
         // Save quote
         $quote->save();
-        
+
         // Convert to order
         $order = $this->quoteManagement->submit($quote);
 
@@ -82,15 +83,15 @@ class Order
         $quote = $this->cartRepository->get($quoteId);
 
         if (!$quote->getGrandTotal()) {
-            throw new \Exception(__METHOD__. " Cannot process quote with zero balance.");
+            throw new Exception(__METHOD__. " Cannot process quote with zero balance.");
         }
 
         if (!$quote->getId()) {
-            throw new \Exception(__METHOD__. " Error loading quote {$quoteId}.");
+            throw new Exception(__METHOD__. " Error loading quote {$quoteId}.");
         }
 
         if (!boolval($quote->getIsActive())) {
-            throw new \Exception(__METHOD__. "Could not process inactive quote {$quoteId}.");
+            throw new Exception(__METHOD__. "Could not process inactive quote {$quoteId}.");
         }
 
         return $quote;

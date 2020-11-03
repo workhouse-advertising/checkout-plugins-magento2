@@ -1,6 +1,7 @@
 <?php
 namespace Latitude\Checkout\Model;
 
+use \Magento\Framework\Exception\LocalizedException as LocalizedException;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
 class Payment extends \Magento\Payment\Model\Method\AbstractMethod
@@ -39,7 +40,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
             " Sending request to latitude refund endpoint: /refund.");
 
         // TODO: send request to refund endpoint
-        throw new \Magento\Framework\Exception\LocalizedException(
+        throw new LocalizedException(
             __('Could not process refund')
         );
     }
