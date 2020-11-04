@@ -1,6 +1,6 @@
-# latitude-checkout
+# latitude-financial/checkout
 
-Demo checkout module for Magneto 2
+Payment gateway integration for Latitude Interest Free products
 
 ## Install module
 
@@ -14,8 +14,8 @@ Demo checkout module for Magneto 2
 
 ```sh
     # add -vvv for verbose mode
-    composer require latitude/checkout  # new installation
-    composer update latitude/checkout   # update existing installation
+    composer require latitude-financial/checkout  # new installation
+    composer update latitude-financial/checkout  # update existing installation
 ```
 
 ### Upgrade your store instance 
@@ -44,10 +44,10 @@ Demo checkout module for Magneto 2
 
 1. Navigate to Magento Admin > Stores > Configuration > Sales > Payment Methods> Latitude
 
-1. Enter the Merchant ID and Secret Key
+2. Enter the Merchant ID and Secret Key
 
-1. Click on Enabled checkbox
+3. Enable payment method by using "Is Enabled ?"
 
-1. Enable Test mode for testing
+4. Enable / Disable test mode by using "Is Test mode"
 
-1. Save the configuration
+5. Click on "Save" to save the configuration
