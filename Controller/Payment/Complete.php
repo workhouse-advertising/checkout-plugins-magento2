@@ -62,13 +62,15 @@ class Complete extends \Magento\Framework\App\Action\Action
             $this->quoteValidator->validateBeforeSubmit($quote);
 
             if (!isset($orderId) || empty($orderId)) {
-                throw new LocalizedException(__("Could not get order id for". $quoteId));
-                return;
+                throw new LocalizedException(
+                    __('Could not get order id for '. $quoteId)
+                );
             }
 
             if (boolval($quote->getIsActive())) {
-                throw new LocalizedException(__("Could not show success for active quote"));
-                return;
+                throw new LocalizedException(
+                    __('Could not show success for active quote')
+                );
             }
 
             $this->logger->debug(__METHOD__. " Processing quote and redirecting to success page. Order Id: {$orderId}");
@@ -95,16 +97,16 @@ class Complete extends \Magento\Framework\App\Action\Action
                 'mage_order_id' => $orderId
             ]);
             return;
-        } catch (LocalizedException $locallizedException) {
-            return $this->_processError($locallizedException);
-        } catch (Exception $exception) {
-            return $this->_processError($exception);
+        } catch (LocalizedException $le) {
+            $this->_processError($le->getRawMessage());
+        } catch (Exception $e) {
+            $this->_processError($e->getMessage());
         }
     }
 
-    private function _processError(Exception $exception)
+    private function _processError($message)
     {
-        $this->logger->error(__METHOD__. " ". $exception->getRawMessage());
+        $this->logger->error(__METHOD__. " ". $message);
         $this->messageManager->addErrorMessage("Your payment was not successful, please try again or select other payment method");
         $this->_redirect("checkout/cart");
     }
