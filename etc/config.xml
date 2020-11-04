@@ -3,7 +3,7 @@
     <default>
         <payment>
             <latitude>
-                <version>v0.1.12</version>
+                <version>v0.1.13</version>
                 <active>1</active>
                 <model>Latitude\Checkout\Model\Payment</model>
                 <merchant_id />
