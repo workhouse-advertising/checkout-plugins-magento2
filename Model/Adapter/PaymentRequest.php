@@ -152,8 +152,8 @@ class PaymentRequest
         $paymentRequest['x_test'] = $paymentGatewayConfig[LatitudeHelper::TEST_MODE] ? "true" : "false";
 
         $paymentRequest['x_platform_type'] = LatitudeConstants::PLATFORM_TYPE;
-        $paymentRequest['x_platform_version'] =$this->_latitudeHelper->getPlatformVersion();
-        $paymentRequest['x_plugin_version'] = LatitudeConstants::PLUGIN_VERSION;
+        $paymentRequest['x_platform_version'] = $this->_latitudeHelper->getPlatformVersion();
+        $paymentRequest['x_plugin_version'] = $this->_latitudeHelper->getVersion();
 
         $paymentRequest['x_signature'] = $this->_latitudeHelper->getHMAC($paymentRequest);
 
