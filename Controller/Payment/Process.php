@@ -2,7 +2,6 @@
 
 namespace Latitude\Checkout\Controller\Payment;
 
-use \Magento\Framework\Exception as Exception;
 use \Magento\Framework\Exception\LocalizedException as LocalizedException;
 
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
@@ -66,7 +65,7 @@ class Process extends \Magento\Framework\App\Action\Action
             return $result;
         } catch (LocalizedException $le) {
             $this->_processError($le->getRawMessage());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_processError($e->getMessage());
         }
     }
@@ -89,7 +88,7 @@ class Process extends \Magento\Framework\App\Action\Action
         $cartId = htmlspecialchars($post['cartId'], ENT_QUOTES);
 
         if (empty($cartId)) {
-            throw new Exception(__("Invalid request"));
+            throw new LocalizedException(__("Invalid request"));
         }
 
         $data = $this->_checkoutSession->getData();
@@ -124,7 +123,7 @@ class Process extends \Magento\Framework\App\Action\Action
                     $address = $objectManager->create('Magento\Customer\Model\Address')->load($billingID);
                     $billingAddress->addData($address->getData());
                 } else {
-                    throw new Exception(__("Invalid billing address"));
+                    throw new LocalizedException(__("Invalid billing address"));
                 }
             } elseif (empty($billingAddress) || empty($billingAddress->getStreetLine(1)) || empty($billingAddress->getFirstname())) {
                 $billingAddress = $quote->getShippingAddress();

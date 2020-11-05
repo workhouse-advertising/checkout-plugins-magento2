@@ -1,6 +1,7 @@
 <?php
 namespace Latitude\Checkout\Model\Adapter;
 
+use \Magento\Framework\Exception\LocalizedException as LocalizedException;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 
@@ -62,7 +63,7 @@ class PaymentRequest
         }
         
         if (count($errors)) {
-            throw new Exception(__(implode($errors, ' ; ')));
+            throw new LocalizedException(__(implode($errors, ' ; ')));
         } else {
             return true;
         }

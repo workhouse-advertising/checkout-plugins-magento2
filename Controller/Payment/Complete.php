@@ -2,7 +2,6 @@
 
 namespace Latitude\Checkout\Controller\Payment;
 
-use \Magento\Framework\Exception as Exception;
 use \Magento\Framework\Exception\LocalizedException as LocalizedException;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
@@ -99,7 +98,7 @@ class Complete extends \Magento\Framework\App\Action\Action
             return;
         } catch (LocalizedException $le) {
             $this->_processError($le->getRawMessage());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_processError($e->getMessage());
         }
     }

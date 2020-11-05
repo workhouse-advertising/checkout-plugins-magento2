@@ -1,7 +1,7 @@
 <?php
 namespace Latitude\Checkout\Model\Adapter;
 
-use \Magento\Framework\Exception as Exception;
+use \Magento\Framework\Exception\LocalizedException as LocalizedException;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 
 /**
@@ -37,24 +37,37 @@ class Order
     {
         $quote = $this->_getQuoteById($quoteId);
 
-        // Set payment method
-        $quote->getPayment()->setMethod(LatitudeConstants::METHOD_CODE);
-
         // Set payment details
         $payment = $quote->getPayment();
+        $payment->importData(['method' => LatitudeConstants::METHOD_CODE]);
+        $payment->setMethod(LatitudeConstants::METHOD_CODE);
         $payment->setAdditionalInformation(LatitudeConstants::QUOTE_ID, $quoteId);
         $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $gatewayReference);
         $payment->setAdditionalInformation(LatitudeConstants::PROMOTION_REFERENCE, $promotionReference);
         $payment->save();
 
-        // validate for errors
-        $this->quoteValidator->validateBeforeSubmit($quote);
-
-        // Save quote
-        $quote->save();
-
         // Convert to order
+        $quote->collectTotals()->save();
+        $this->quoteValidator->validateBeforeSubmit($quote);
         $order = $this->quoteManagement->submit($quote);
+
+        if (!$order) {
+            throw new LocalizedException(__("Could not create order for quote ". $quoteId));
+        }
+
+        // set additional info
+        $payment = $order->getPayment();
+        $payment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $payment->getAdditionalInformation());
+
+        // set parent transaction
+        $payment->setTransactionId($gatewayReference)
+            ->setCurrencyCode($order->getBaseCurrencyCode())
+            ->setParentTransactionId($payment->getTransactionId())
+            ->setShouldCloseParentTransaction(true)
+            ->setIsTransactionClosed(false)
+            ->registerCaptureNotification($order->getBaseGrandTotal());
+        
+        $order->save();
 
         switch ($order->getState()) {
             // handle auth/capture exceptions caused by paypal or bank capture
@@ -83,15 +96,21 @@ class Order
         $quote = $this->cartRepository->get($quoteId);
 
         if (!$quote->getGrandTotal()) {
-            throw new Exception(__METHOD__. " Cannot process quote with zero balance.");
+            throw new LocalizedException(
+                __("Cannot process quote with zero balance.")
+            );
         }
 
         if (!$quote->getId()) {
-            throw new Exception(__METHOD__. " Error loading quote {$quoteId}.");
+            throw new LocalizedException(
+                __("Error loading quote {$quoteId}.")
+            );
         }
 
         if (!boolval($quote->getIsActive())) {
-            throw new Exception(__METHOD__. "Could not process inactive quote {$quoteId}.");
+            throw new LocalizedException(
+                __("Could not process inactive quote {$quoteId}.")
+            );
         }
 
         return $quote;
