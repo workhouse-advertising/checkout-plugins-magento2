@@ -14,6 +14,7 @@ class Helper
     const MERCHANT_SECRET = 'merchant_secret';
     const TEST_MODE = 'test_mode';
     const VERSION = "version";
+    const TERMS_URL = "terms_url";
 
     const API_URL_TEST = 'https://api.test.latitudefinancial.com/v1/applybuy-checkout-service';
     const API_URL_PROD = 'https://api.latitudefinancial.com/v1/applybuy-checkout-service';
@@ -58,6 +59,11 @@ class Helper
         return $config;
     }
 
+    public function getMerchantId()
+    {
+        return $this->_readConfig(self::MERCHANT_ID);
+    }
+
     public function isTestMode()
     {
         return boolval($this->_readConfig(self::TEST_MODE));
@@ -76,6 +82,11 @@ class Helper
     public function getVersion()
     {
         return $this->_readConfig(self::VERSION, true);
+    }
+
+    public function getTermsUrl()
+    {
+        return $this->_readConfig(self::TERMS_URL, true);
     }
 
     public function getHMAC($payload)

@@ -30,6 +30,10 @@
                     <config_path>payment/latitude/test_mode</config_path>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="terms_url" translate="label" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Terms and conditions</label>
+                    <config_path>payment/latitude/terms_url</config_path>
+                </field>
             </group>
         </section>
     </system>

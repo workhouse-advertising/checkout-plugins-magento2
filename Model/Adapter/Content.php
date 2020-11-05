@@ -23,9 +23,8 @@ class Content
 
     public function getTermsURL()
     {
-        return $this->_isNZ() ?
-        "https://checkout.latitudefinancial.com/about/nz" :
-        "https://checkout.latitudefinancial.com/about/au";
+        $termsUrl = $this->latitudeHelper->getTermsUrl();
+        return !empty($termsUrl) ? $termsUrl : "https://checkout.latitudefinancial.com";
     }
 
     public function getContent()
@@ -47,7 +46,7 @@ class Content
         Latitude Gem Visa has a range of Interest Free offers that work for you.";
         $resp['description2'] = "You will be redirected to Latitude checkout to complete your order";
         $resp['applyText'] = "Not a Latitude customer";
-        $resp['applyURL'] = "https://checkout.latitudefinancial.com/about/au";
+        $resp['applyURL'] = "https://checkout.latitudefinancial.com/about/au?merchantId=". $this->latitudeHelper->getMerchantId();
 
         return $resp;
     }
@@ -66,7 +65,7 @@ class Content
         Latitude Gem Visa has a range of Interest Free offers that work for you.";
         $resp['description2'] = "You will be redirected to Gem Visa checkout to complete your order";
         $resp['applyText'] = "Not a Gem Visa customer";
-        $resp['applyURL'] = "https://checkout.latitudefinancial.com/about/nz";
+        $resp['applyURL'] = "https://checkout.latitudefinancial.com/about/nz?merchantId=". $this->latitudeHelper->getMerchantId();
 
         return $resp;
     }
