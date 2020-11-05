@@ -70,9 +70,9 @@ class Process extends \Magento\Framework\App\Action\Action
 
     private function _processError($message)
     {
-        $this->logger->error(__METHOD__. $message);
+        $this->_logger->error(__METHOD__. $message);
 
-        $result = $this->jsonResultFactory->create();
+        $result = $this->_jsonResultFactory->create();
         $result->setData(['error' => true, 'message' => __("Could not process request. ". $message)]);
 
         return $result;
