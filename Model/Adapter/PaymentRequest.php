@@ -38,11 +38,11 @@ class PaymentRequest
     public function get($quote, $quoteId)
     {
         $paymentRequest = $this->_createRequest($quote, $quoteId);
-        $this->validateAddress($paymentRequest);
+        $this->_validateAddress($paymentRequest);
         return $paymentRequest;
     }
 
-    public function validateAddress($paymentRequest)
+    private function _validateAddress($paymentRequest)
     {
         $errors = [];
        
@@ -69,14 +69,7 @@ class PaymentRequest
         }
     }
 
-    /**
-     * Create payment request
-     *
-     * @param $quote
-     * @param array $quoteId
-     * @return array
-     */
-    protected function _createRequest($quote, $quoteId)
+    private function _createRequest($quote, $quoteId)
     {
         $precision = 2;
 

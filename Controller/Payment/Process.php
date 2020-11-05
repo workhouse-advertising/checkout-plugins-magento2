@@ -52,8 +52,6 @@ class Process extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-        $paymentMethod = 'authorize_capture';
-
         try {
             $paymentRequest = $this->_processCapture();
 
@@ -75,7 +73,7 @@ class Process extends \Magento\Framework\App\Action\Action
         $this->logger->error(__METHOD__. $message);
 
         $result = $this->jsonResultFactory->create();
-        $result->setData(['error' => true, 'message' => __("Could not process request. Check logs for more details")]);
+        $result->setData(['error' => true, 'message' => __("Could not process request. ". $message)]);
 
         return $result;
     }

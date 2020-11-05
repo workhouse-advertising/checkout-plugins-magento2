@@ -34,7 +34,6 @@ define([
     },
 
     getContent: function () {
-      console.log({ data: window.checkoutConfig.payment.latitude.content });
       return window.checkoutConfig.payment.latitude.content;
     },
 
@@ -81,7 +80,6 @@ define([
         },
       })
         .done(function (response) {
-          console.log({ response });
           var data = response;
 
           var redirectToPortal = function (paymentRequest) {
