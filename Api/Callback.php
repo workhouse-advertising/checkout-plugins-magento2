@@ -78,6 +78,8 @@ class Callback
 
         $this->logger->debug(__METHOD__. " Begin callback with request: " . $this->jsonHelper->jsonEncode($post));
 
+        $orderId = "";
+
         try {
             $validationResult = $this->_validateRequest($post, $signature);
 
@@ -88,10 +90,21 @@ class Callback
                 );
             }
 
+            $orderId = $post[self::MERCHANT_REFERENCE];
+
             if ($post[self::RESULT] == LatitudeConstants::TRANSACTION_RESULT_FAILED) {
                 $this->orderAdapter->addError($post[self::MERCHANT_REFERENCE], "Order failed with message ". $post[self::MESSAGE]);
                 $this->_dispatch($post, false);
-                return $gatewayReference;
+                $result = [[
+                    "message" => "Failed order ". $orderId,
+                    "merchantId" => $post[self::MERCHANT_ID],
+                    "gatewayReference" => $post[self::GATEWAY_REFERENCE],
+                    "promotionReference" => $post[self::PROMOTION_REFERENCE],
+                    "orderReference" => $orderId,
+                    "amount" => $post[self::AMOUNT],
+                ]];
+
+                return $result;
             }
 
             $orderId = $this->orderAdapter->complete(
@@ -104,7 +117,7 @@ class Callback
             $this->_dispatch($post, true);
 
             $result = [[
-                "message" => "Order created with id ". $orderId,
+                "message" => "Created order ". $orderId,
                 "merchantId" => $post[self::MERCHANT_ID],
                 "gatewayReference" => $post[self::GATEWAY_REFERENCE],
                 "promotionReference" => $post[self::PROMOTION_REFERENCE],
@@ -116,6 +129,21 @@ class Callback
         } catch (LocalizedException $le) {
             $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {
+            if (preg_match('/Invalid state change requested/i', $e->getMessage())) {
+                $this->logger->debug(__METHOD__. " Ignored: Invalid state change requested ");
+
+                $result = [[
+                    "message" => "Created order (ignored state change) ". $orderId,
+                    "merchantId" => $post[self::MERCHANT_ID],
+                    "gatewayReference" => $post[self::GATEWAY_REFERENCE],
+                    "promotionReference" => $post[self::PROMOTION_REFERENCE],
+                    "orderReference" => $orderId,
+                    "amount" => $post[self::AMOUNT],
+                ]];
+                
+                return $result;
+            }
+
             $this->_processError($e->getMessage());
         }
     }
