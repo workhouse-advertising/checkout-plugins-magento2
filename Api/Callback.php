@@ -127,6 +127,21 @@ class Callback
 
             return $result;
         } catch (LocalizedException $le) {
+            if (preg_match('/Invalid state change requested/i', $e->getRawMessage())) {
+                $this->logger->debug(__METHOD__. " Ignored: Invalid state change requested ");
+
+                $result = [[
+                    "message" => "Created order (ignored state change) ". $orderId,
+                    "merchantId" => $post[self::MERCHANT_ID],
+                    "gatewayReference" => $post[self::GATEWAY_REFERENCE],
+                    "promotionReference" => $post[self::PROMOTION_REFERENCE],
+                    "orderReference" => $orderId,
+                    "amount" => $post[self::AMOUNT],
+                ]];
+                
+                return $result;
+            }
+
             $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {
             if (preg_match('/Invalid state change requested/i', $e->getMessage())) {
