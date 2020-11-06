@@ -27,6 +27,11 @@
   width: auto;
 }
 
+.latitude-content-image-container {
+  display: flex;
+  flex-direction: row;
+}
+
 .payment-content-image {
     height: 65px;
     width: auto;

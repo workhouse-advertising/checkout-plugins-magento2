@@ -28,11 +28,21 @@
 
     <p data-bind="text: getContent().heading"></p>
 
-    <img
-      data-bind="attr: {src: getContent().image1}"
-      class="payment-content-image"
-      alt="Latitude"
-    />
+    <div class="latitude-content-image-container">
+      <img
+        data-bind="attr: {src: getContent().image1}"
+        class="payment-content-image"
+        alt="Latitude image left"
+      />
+
+      <!-- ko if: getContent().image2 -->
+      <img
+        data-bind="attr: {src: getContent().image2}"
+        class="payment-content-image"
+        alt="Latitude image right"
+      />
+      <!-- /ko -->
+    </div>
 
     <p data-bind="text: getContent().description1"></p>
 

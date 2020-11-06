@@ -36,10 +36,8 @@ class Content
     {
         $resp['title'] = "Enjoy Now. Pay Later.";
 
-        // TODO: use assets.latitudefinancial.com
-        $resp['image1'] = "https://cdn.zeplin.io/5f9610a994acbe213a1756f2/assets/5E59F306-6E43-473B-B8AB-E8B0E27A1230.png";
-        // TODO: use assets.latitudefinancial.com
-        $resp['image2'] = "https://cdn.zeplin.io/5f9610a994acbe213a1756f2/assets/5E59F306-6E43-473B-B8AB-E8B0E27A1230.png";
+        $resp['image1'] = "https://assets.latitudefinancial.com/merchant-services/latitude/icon/interest-free-badge.svg";
+        $resp['image2'] = "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg";
 
         $resp['heading'] = "Flexible Latitude Interest Free plans to suit your needs";
         $resp['description1'] = "We’re here to help you get what you need. With plans from 6-24 months,
@@ -55,10 +53,8 @@ class Content
     {
         $resp['title'] = "Enjoy Now. Pay Later.";
 
-        // TODO: use assets.latitudefinancial.com
-        $resp['image1'] = "https://cdn.zeplin.io/5f9610a994acbe213a1756f2/assets/5E59F306-6E43-473B-B8AB-E8B0E27A1230.png";
-        // TODO: use assets.latitudefinancial.com
-        $resp['image2'] = "https://cdn.zeplin.io/5f9610a994acbe213a1756f2/assets/5E59F306-6E43-473B-B8AB-E8B0E27A1230.png";
+        $resp['image1'] = "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg";
+        $resp['image2'] = "";
 
         $resp['heading'] = "Flexible Gem Interest Free plans to suit your needs";
         $resp['description1'] = "We’re here to help you get what you need. With plans from 6-24 months,

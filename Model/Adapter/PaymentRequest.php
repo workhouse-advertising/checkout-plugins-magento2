@@ -85,8 +85,13 @@ class PaymentRequest
         $billingAddress  = $quote->getBillingAddress();
         $shippingAddress = $quote->getShippingAddress();
 
-        $paymentRequest['x_amount'] = round((float)$quote->getGrandTotal(), $precision);
         $paymentRequest['x_currency'] = (string)$additionalData['store_currency_code'];
+
+        if (!in_array($paymentRequest['x_currency'], LatitudeConstants::ALLOWED_CURRENCY)) {
+            throw new LocalizedException(__("Unsupported currency ". $paymentRequest["x_currency"]));
+        }
+
+        $paymentRequest['x_amount'] = round((float)$quote->getGrandTotal(), $precision);
 
         $paymentRequest['x_customer_first_name'] = $quote->getCustomerFirstname() ? (string)$quote->getCustomerFirstname() : $billingAddress->getFirstname();
         $paymentRequest['x_customer_last_name'] = $quote->getCustomerLastname() ? (string)$quote->getCustomerLastname() : $billingAddress->getLastname();

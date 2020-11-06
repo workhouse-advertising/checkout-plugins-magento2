@@ -107,6 +107,19 @@ define([
 
           if (
             typeof data.success !== "undefined" &&
+            typeof data.message !== "undefined" &&
+            !data.success
+          ) {
+            console.error("request failed with " + data.message);
+            globalMessageList.addErrorMessage({
+              message:
+                "We could not process this request at this time, please try again or select other payment method",
+            });
+            return;
+          }
+
+          if (
+            typeof data.success !== "undefined" &&
             typeof data.url !== "undefined" &&
             data.success
           ) {
@@ -122,23 +135,9 @@ define([
 
             return;
           }
-
-          if (
-            typeof data.error !== "undefined" &&
-            typeof data.message !== "undefined" &&
-            data.error &&
-            data.message.length
-          ) {
-            console.error("request failed with status " + data.message);
-            globalMessageList.addErrorMessage({
-              message: data.message,
-            });
-
-            return;
-          }
         })
         .fail(function (xhr, status) {
-          console.error("request failed with status " + status);
+          console.error("request failed with " + status);
           globalMessageList.addErrorMessage({
             message:
               "We could not process this request at this time, please try again or select other payment method",

@@ -9,7 +9,6 @@ class Callback
 {
     protected $request;
     protected $jsonHelper;
-    protected $jsonResultFactory;
     protected $eventManager;
 
     protected $logger;
@@ -33,7 +32,6 @@ class Callback
     public function __construct(
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
-        \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Latitude\Checkout\Logger\Logger $logger,
         \Latitude\Checkout\Model\Adapter\Order $orderAdapter,
@@ -41,7 +39,6 @@ class Callback
     ) {
         $this->request = $request;
         $this->jsonHelper = $jsonHelper;
-        $this->jsonResultFactory = $jsonResultFactory;
         $this->eventManager = $eventManager;
 
         $this->logger = $logger;
@@ -106,7 +103,16 @@ class Callback
             $this->logger->info(__METHOD__. " Order Created");
             $this->_dispatch($post, true);
 
-            return $orderId;
+            $result = [[
+                "message" => "Order created with id ". $orderId,
+                "merchantId" => $post[self::MERCHANT_ID],
+                "gatewayReference" => $post[self::GATEWAY_REFERENCE],
+                "promotionReference" => $post[self::PROMOTION_REFERENCE],
+                "orderReference" => $orderId,
+                "amount" => $post[self::AMOUNT],
+            ]];
+
+            return $result;
         } catch (LocalizedException $le) {
             $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {

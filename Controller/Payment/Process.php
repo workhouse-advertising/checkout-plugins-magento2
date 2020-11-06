@@ -62,9 +62,9 @@ class Process extends \Magento\Framework\App\Action\Action
 
             return $result;
         } catch (LocalizedException $le) {
-            $this->_processError($le->getRawMessage());
+            return $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {
-            $this->_processError($e->getMessage());
+            return $this->_processError($e->getMessage());
         }
     }
 
@@ -72,8 +72,10 @@ class Process extends \Magento\Framework\App\Action\Action
     {
         $this->_logger->error(__METHOD__. $message);
 
-        $result = $this->_jsonResultFactory->create();
-        $result->setData(['error' => true, 'message' => __("Could not process request. ". $message)]);
+        $result['success'] = false;
+        $result['message'] = $message;
+
+        $result = $this->_jsonResultFactory->create()->setData($result);
 
         return $result;
     }
