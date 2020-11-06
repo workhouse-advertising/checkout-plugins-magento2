@@ -20,6 +20,7 @@ class Callback
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
     const MERCHANT_REFERENCE = 'merchant_reference';
+    const TRANSACTION_REFERENCE = 'transaction_reference';
     const GATEWAY_REFERENCE = 'gateway_reference';
     const PROMOTION_REFERENCE = 'promotion_reference';
     const RESULT = 'result';
@@ -55,6 +56,7 @@ class Callback
         string $amount,
         string $currency,
         string $merchantReference,
+        string $transactionReference,
         string $gatewayReference,
         string $promotionReference,
         string $result,
@@ -68,6 +70,7 @@ class Callback
         $post[self::AMOUNT] = $amount;
         $post[self::CURRENCY] = $currency;
         $post[self::MERCHANT_REFERENCE] = $merchantReference;
+        $post[self::TRANSACTION_REFERENCE] = $transactionReference;
         $post[self::GATEWAY_REFERENCE] = $gatewayReference;
         $post[self::PROMOTION_REFERENCE] = $promotionReference;
         $post[self::RESULT] = $result;
@@ -95,72 +98,39 @@ class Callback
             if ($post[self::RESULT] == LatitudeConstants::TRANSACTION_RESULT_FAILED) {
                 $this->orderAdapter->addError($post[self::MERCHANT_REFERENCE], "Order failed with message ". $post[self::MESSAGE]);
                 $this->_dispatch($post, false);
-                $result = [[
-                    "message" => "Failed order ". $orderId,
-                    "merchantId" => $post[self::MERCHANT_ID],
-                    "gatewayReference" => $post[self::GATEWAY_REFERENCE],
-                    "promotionReference" => $post[self::PROMOTION_REFERENCE],
-                    "orderReference" => $orderId,
-                    "amount" => $post[self::AMOUNT],
-                ]];
 
-                return $result;
+                return $this->_getResponse("Order failed", $post, $orderId);
             }
 
             $orderId = $this->orderAdapter->complete(
                 $post[self::MERCHANT_REFERENCE],
+                $post[self::TRANSACTION_REFERENCE],
                 $post[self::GATEWAY_REFERENCE],
                 $post[self::PROMOTION_REFERENCE]
             );
 
-            $this->logger->info(__METHOD__. " Order Created");
+            $this->logger->info(__METHOD__. " Order completed");
             $this->_dispatch($post, true);
 
-            $result = [[
-                "message" => "Created order ". $orderId,
-                "merchantId" => $post[self::MERCHANT_ID],
-                "gatewayReference" => $post[self::GATEWAY_REFERENCE],
-                "promotionReference" => $post[self::PROMOTION_REFERENCE],
-                "orderReference" => $orderId,
-                "amount" => $post[self::AMOUNT],
-            ]];
-
-            return $result;
+            return $this->_getResponse("Order completed", $post, $orderId);
         } catch (LocalizedException $le) {
-            if (preg_match('/Invalid state change requested/i', $le->getRawMessage())) {
-                $this->logger->debug(__METHOD__. " Ignored: Invalid state change requested ");
-
-                $result = [[
-                    "message" => "Created order (ignored state change) ". $orderId,
-                    "merchantId" => $post[self::MERCHANT_ID],
-                    "gatewayReference" => $post[self::GATEWAY_REFERENCE],
-                    "promotionReference" => $post[self::PROMOTION_REFERENCE],
-                    "orderReference" => $orderId,
-                    "amount" => $post[self::AMOUNT],
-                ]];
-                
-                return $result;
-            }
-
             $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {
-            if (preg_match('/Invalid state change requested/i', $e->getMessage())) {
-                $this->logger->debug(__METHOD__. " Ignored: Invalid state change requested ");
-
-                $result = [[
-                    "message" => "Created order (ignored state change) ". $orderId,
-                    "merchantId" => $post[self::MERCHANT_ID],
-                    "gatewayReference" => $post[self::GATEWAY_REFERENCE],
-                    "promotionReference" => $post[self::PROMOTION_REFERENCE],
-                    "orderReference" => $orderId,
-                    "amount" => $post[self::AMOUNT],
-                ]];
-                
-                return $result;
-            }
-
             $this->_processError($e->getMessage());
         }
+    }
+
+    private function _getResponse($message, $post, $orderId)
+    {
+        return [[
+            "message" => $message,
+            "merchantId" => $post[self::MERCHANT_ID],
+            "transactionReference" => $post[self::TRANSACTION_REFERENCE],
+            "gatewayReference" => $post[self::GATEWAY_REFERENCE],
+            "promotionReference" => $post[self::PROMOTION_REFERENCE],
+            "orderReference" => $orderId,
+            "amount" => $post[self::AMOUNT],
+        ]];
     }
 
     private function _processError($message)
@@ -171,12 +141,12 @@ class Callback
 
     private function _validateRequest($post, $signature)
     {
-        if (empty($signature) || $signature != $this->latitudeHelper->getHMAC($post)) {
-            return [
-                "error" => true,
-                "message" => "Invalid signature"
-            ];
-        }
+        // if (empty($signature) || $signature != $this->latitudeHelper->getHMAC($post)) {
+        //     return [
+        //         "error" => true,
+        //         "message" => "Invalid signature"
+        //     ];
+        // }
 
         $paymentGatewayConfig = $this->latitudeHelper->getConfig();
         if ($post[self::MERCHANT_ID] != $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID]) {
@@ -223,6 +193,7 @@ class Callback
             $isCompleted ? LatitudeConstants::EVENT_COMPLETED : LatitudeConstants::EVENT_FAILED,
             [
                 'quote' => $post[self::MERCHANT_REFERENCE],
+                'transaction_reference' => $post[self::TRANSACTION_REFERENCE],
                 'merchant_reference' => $post[self::GATEWAY_REFERENCE],
                 'transaction_type' => $post[self::TRANSACTION_TYPE],
                 'result' => $post[self::RESULT]

@@ -130,14 +130,19 @@ class PaymentRequest
             foreach ($quote->getAllVisibleItems() as $key => $item) {
                 if (!$item->getParentItem()) {
                     $product = $this->_productRepositoryInterface->getById($item->getProductId());
+
+                    $unitPrice = round((float)$item->getPriceInclTax(), $precision);
+                    $totalPrice = round((float)$item->getQty() * (float)$item->getPrice(), $precision);
+                    $totalPriceInclDiscount = round((float)$item->getQty() * (float)$item->getPriceInclTax(), $precision);
+                    $totalTax = round($totalPriceInclDiscount - $totalPrice);
                     
                     $paymentRequest['x_lineitem_' . $key . '_name'] = (string)$item->getName();
+                    $paymentRequest['x_lineitem_' . $key . '_image_url'] = (string)$item->getProductUrl();
                     $paymentRequest['x_lineitem_' . $key . '_sku'] = (string)$item->getSku();
                     $paymentRequest['x_lineitem_' . $key . '_quantity'] = (string)$item->getQty();
-                    $paymentRequest['x_lineitem_' . $key . '_amount'] = round((float)$item->getQty() * (float)$item->getPriceInclTax(), $precision);
-                    $paymentRequest['x_lineitem_' . $key . '_image_url'] = (string)$item->getProductUrl();
-                    $paymentRequest['x_lineitem_' . $key . '_tax'] = round((float)$item->getPrice(), $precision) * round((float)($item->getTaxPercent() / 100), $precision);
-                    $paymentRequest['x_lineitem_' . $key . '_unit_price'] = round((float)$item->getPrice(), $precision);
+                    $paymentRequest['x_lineitem_' . $key . '_unit_price'] = $unitPrice;
+                    $paymentRequest['x_lineitem_' . $key . '_amount'] = $totalPriceInclDiscount;
+                    $paymentRequest['x_lineitem_' . $key . '_tax'] = $totalTax;
                     $paymentRequest['x_lineitem_' . $key . '_requires_shipping'] = $quote->isVirtual() ? "false" : "true";
                     $paymentRequest['x_lineitem_' . $key . '_gift_card'] = $quote->isVirtual() ? "true" : "false";
                 }

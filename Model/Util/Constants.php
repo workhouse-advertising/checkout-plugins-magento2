@@ -16,6 +16,7 @@ class Constants
     const COMPLETE_ROUTE = 'latitude/payment/complete';
 
     const QUOTE_ID= 'quote_id';
+    const TRANSACTION_REFERENCE = 'transaction_reference';
     const GATEWAY_REFERENCE = 'gateway_reference';
     const PAYMENT_RESULT = 'payment_result';
     const PROMOTION_REFERENCE = 'promotion';

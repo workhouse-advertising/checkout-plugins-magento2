@@ -9,6 +9,7 @@ interface CallbackInterface
      * @param string $amount
      * @param string $currency,
      * @param string $merchantReference,
+     * @param string $transactionReference,
      * @param string $gatewayReference,
      * @param string $promotionReference,
      * @param string $result,
@@ -24,6 +25,7 @@ interface CallbackInterface
         string $amount,
         string $currency,
         string $merchantReference,
+        string $transactionReference,
         string $gatewayReference,
         string $promotionReference,
         string $result,

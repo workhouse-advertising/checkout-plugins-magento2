@@ -33,7 +33,7 @@ class Order
         $this->checkoutSession = $checkoutSession;
     }
 
-    public function complete($quoteId, $gatewayReference, $promotionReference)
+    public function complete($quoteId, $transactionReference, $gatewayReference, $promotionReference)
     {
         $quote = $this->_getQuoteById($quoteId);
 
@@ -42,6 +42,7 @@ class Order
         $payment->importData(['method' => LatitudeConstants::METHOD_CODE]);
         $payment->setMethod(LatitudeConstants::METHOD_CODE);
         $payment->setAdditionalInformation(LatitudeConstants::QUOTE_ID, $quoteId);
+        $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $transactionReference);
         $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $gatewayReference);
         $payment->setAdditionalInformation(LatitudeConstants::PROMOTION_REFERENCE, $promotionReference);
         $payment->save();
@@ -77,7 +78,7 @@ class Order
             case \Magento\Sales\Model\Order::STATE_PROCESSING:
             case \Magento\Sales\Model\Order::STATE_COMPLETE:
             case \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW:
-                $this->emailSender->send(($order));
+                // $this->emailSender->send(($order));
                 break;
             default:
                 break;
