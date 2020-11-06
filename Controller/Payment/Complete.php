@@ -90,12 +90,7 @@ class Complete extends \Magento\Framework\App\Action\Action
             " lastOrderId:". $this->checkoutSession->getLastOrderId().
             " lastRealOrderId:". $this->checkoutSession->getLastRealOrderId());
         
-            $this->_redirect('checkout/onepage/success', [
-                '_secure' => true,
-                '_nosid' => true,
-                'mage_order_id' => $orderId
-            ]);
-            return;
+            $this->_redirect('checkout/onepage/success');
         } catch (LocalizedException $le) {
             $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {
