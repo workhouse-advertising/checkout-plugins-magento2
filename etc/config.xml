@@ -13,7 +13,10 @@
                 <order_status>pending</order_status>
                 <payment_action>sale</payment_action>
                 <title>Latitude Interest Free</title>
-                <currency>AUD</currency>
+                <allowspecific>1</allowspecific>
+                <specificcountry>AU,NZ</specificcountry>
+                <allowspecificcurrency>1</allowspecificcurrency>
+                <currency>AUD,NZD</currency>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <can_void>1</can_void>
