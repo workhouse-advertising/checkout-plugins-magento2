@@ -13,6 +13,7 @@ class PaymentRequest
 {
     protected $_storeManagerInterface;
     protected $_productRepositoryInterface;
+    protected $_regionHelper;
     protected $_latitudeHelper;
 
     /**
@@ -23,10 +24,12 @@ class PaymentRequest
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryInterface,
+        \Magento\Directory\Model\Region $regionHelper,
         LatitudeHelper $latitudeHelper
     ) {
         $this->_storeManagerInterface = $storeManagerInterface;
         $this->_productRepositoryInterface = $productRepositoryInterface;
+        $this->_regionHelper = $regionHelper;
         $this->_latitudeHelper = $latitudeHelper;
     }
 
@@ -102,7 +105,7 @@ class PaymentRequest
             $paymentRequest['x_shipping_line2'] = (string)$shippingAddress->getStreetLine(2);
             $paymentRequest['x_shipping_area1'] = (string)$shippingAddress->getCity();
             $paymentRequest['x_shipping_postcode'] = (string)$shippingAddress->getPostcode();
-            $paymentRequest['x_shipping_region'] = (string)$shippingAddress->getRegion();
+            $paymentRequest['x_shipping_region'] = (string)$this->_getRegion($shippingAddress);
             $paymentRequest['x_shipping_country_code'] = (string)$shippingAddress->getCountryId();
             $paymentRequest['x_shipping_phone'] = (string)$shippingAddress->getTelephone();
         }
@@ -112,7 +115,7 @@ class PaymentRequest
         $paymentRequest['x_billing_line2'] = (string)$billingAddress->getStreetLine(2);
         $paymentRequest['x_billing_area1'] = (string)$billingAddress->getCity();
         $paymentRequest['x_billing_postcode'] = (string)$billingAddress->getPostcode();
-        $paymentRequest['x_billing_region'] = (string)$billingAddress->getRegion();
+        $paymentRequest['x_billing_region'] = (string)$this->_getRegion($billingAddress);
         $paymentRequest['x_billing_country_code'] = (string)$billingAddress->getCountryId();
         $paymentRequest['x_billing_phone'] = (string)$billingAddress->getTelephone();
 
@@ -188,5 +191,15 @@ class PaymentRequest
         }
 
         return 0;
+    }
+
+    private function _getRegion($address)
+    {
+        if ($address->getRegionCode()) {
+            return $address->getRegionCode();
+        }
+
+        $region = $this->_regionHelper->load($address->getRegionId());
+        return $region->getCode();
     }
 }

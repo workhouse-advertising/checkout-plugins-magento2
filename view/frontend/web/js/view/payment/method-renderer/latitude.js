@@ -129,6 +129,7 @@ define([
             data.error &&
             data.message.length
           ) {
+            console.error("request failed with status " + data.message);
             globalMessageList.addErrorMessage({
               message: data.message,
             });

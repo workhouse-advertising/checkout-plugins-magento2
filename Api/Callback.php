@@ -82,9 +82,12 @@ class Callback
         $this->logger->debug(__METHOD__. " Begin callback with request: " . $this->jsonHelper->jsonEncode($post));
 
         try {
-            if (!$this->_validateRequest($post, $signature)) {
+            $validationResult = $this->_validateRequest($post, $signature);
+
+            if ($validationResult["error"]) {
+                $this->logger->error(__METHOD__. $validationResult["message"]);
                 throw new LocalizedException(
-                    __("Could not Validate Request")
+                    __("Validation failed with error: ". $validationResult["message"])
                 );
             }
 
@@ -105,50 +108,64 @@ class Callback
 
             return $orderId;
         } catch (LocalizedException $le) {
-            $this->logger->error(__METHOD__. " ". $le->getMessage());
-            throw new \Magento\Framework\Webapi\Exception(__('Bad Request'), 400);
+            $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {
-            $this->logger->error(__METHOD__. " ". $e->getMessage());
-            throw new \Magento\Framework\Webapi\Exception(__('Bad Request'), 400);
+            $this->_processError($e->getMessage());
         }
+    }
+
+    private function _processError($message)
+    {
+        $this->logger->error(__METHOD__. " ". $message);
+        throw new \Magento\Framework\Webapi\Exception(__("Bad Request - ". $message), 400);
     }
 
     private function _validateRequest($post, $signature)
     {
         if (empty($signature) || $signature != $this->latitudeHelper->getHMAC($post)) {
-            $this->logger->debug(__METHOD__. " actual: ". $signature);
-            $this->logger->debug(__METHOD__. " expected: ". $this->latitudeHelper->getHMAC($post));
-            $this->logger->error(__METHOD__. " Could not verify HMAC");
-            return false;
+            return [
+                "error" => true,
+                "message" => "Invalid signature"
+            ];
         }
 
         $paymentGatewayConfig = $this->latitudeHelper->getConfig();
         if ($post[self::MERCHANT_ID] != $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID]) {
-            $this->logger->error(__METHOD__. " Unexpected merchant id ". $post[self::MERCHANT_ID]);
-            return false;
+            return [
+                "error" => true,
+                "message" => "Invalid merchant"
+            ];
         }
 
         if (!in_array($post[self::CURRENCY], LatitudeConstants::ALLOWED_CURRENCY)) {
-            $this->logger->error(__METHOD__. " Unsupported currency");
-            return false;
+            return [
+                "error" => true,
+                "message" => "Unsupported currency"
+            ];
         }
         
         if (!in_array($post[self::RESULT], array(
                 LatitudeConstants::TRANSACTION_RESULT_COMPLETED,
                 LatitudeConstants::TRANSACTION_RESULT_FAILED
             ))) {
-            $this->logger->error(__METHOD__. " Unsupported result");
-            return false;
+            return [
+                "error" => true,
+                "message" => "Unsupported result"
+            ];
         }
 
         if (!in_array($post[self::TRANSACTION_TYPE], array(
                 LatitudeConstants::TRANSACTION_TYPE_SALE
             ))) {
-            $this->logger->error(__METHOD__. " Unsupported transaction type");
-            return false;
+            return [
+                "error" => true,
+                "message" => "Unsupported transaction type"
+            ];
         }
 
-        return true;
+        return [
+            "error" => false,
+        ];
     }
 
     private function _dispatch($post, $isCompleted)
