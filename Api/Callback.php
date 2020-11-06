@@ -127,7 +127,7 @@ class Callback
 
             return $result;
         } catch (LocalizedException $le) {
-            if (preg_match('/Invalid state change requested/i', $e->getRawMessage())) {
+            if (preg_match('/Invalid state change requested/i', $le->getRawMessage())) {
                 $this->logger->debug(__METHOD__. " Ignored: Invalid state change requested ");
 
                 $result = [[
