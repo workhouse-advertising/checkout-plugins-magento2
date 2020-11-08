@@ -108,7 +108,7 @@ class Process extends \Magento\Framework\App\Action\Action
             $customer = $customerRepository->getById($customerId);
 
             // logged in customer
-            $quote->setCustomer($customer);
+            $quote->assignCustomer($customer);
 
             $billingAddress  = $quote->getBillingAddress();
             $shippingAddress = $quote->getShippingAddress();
@@ -148,7 +148,8 @@ class Process extends \Magento\Framework\App\Action\Action
                 $email = filter_var($email, FILTER_SANITIZE_EMAIL);
 
                 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $quote->setCustomerEmail($email)
+                    $quote->setCustomerId(null)
+                        ->setCustomerEmail($email)
                         ->setCustomerIsGuest(true)
                         ->setCustomerGroupId(\Magento\Customer\Api\Data\GroupInterface::NOT_LOGGED_IN_ID);
                 }

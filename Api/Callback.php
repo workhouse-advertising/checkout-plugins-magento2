@@ -81,10 +81,19 @@ class Callback
 
         $this->logger->debug(__METHOD__. " Begin callback with request: " . $this->jsonHelper->jsonEncode($post));
 
-        $orderId = "";
-
         try {
             $validationResult = $this->_validateRequest($post, $signature);
+
+            $response = [[
+                "message" => "Quote updated",
+                "result" => $post[self::RESULT],
+                "merchantId" => $post[self::MERCHANT_ID],
+                "merchantReference" => $post[self::MERCHANT_REFERENCE],
+                "gatewayReference" => $post[self::GATEWAY_REFERENCE],
+                "transactionReference" => $post[self::TRANSACTION_REFERENCE],
+                "promotionReference" => $post[self::PROMOTION_REFERENCE],
+                "amount" => $post[self::AMOUNT],
+            ]];
 
             if ($validationResult["error"]) {
                 $this->logger->error(__METHOD__. $validationResult["message"]);
@@ -93,44 +102,30 @@ class Callback
                 );
             }
 
-            $orderId = $post[self::MERCHANT_REFERENCE];
-
             if ($post[self::RESULT] == LatitudeConstants::TRANSACTION_RESULT_FAILED) {
-                $this->orderAdapter->addError($post[self::MERCHANT_REFERENCE], "Order failed with message ". $post[self::MESSAGE]);
+                $this->logger->info(__METHOD__. " Quote updated with result: ". $post[self::RESULT]);
                 $this->_dispatch($post, false);
 
-                return $this->_getResponse("Order failed", $post, $orderId);
+                return $response;
             }
 
-            $orderId = $this->orderAdapter->complete(
+            $this->orderAdapter->addTransactionInfo(
                 $post[self::MERCHANT_REFERENCE],
+                $post[self::AMOUNT],
                 $post[self::TRANSACTION_REFERENCE],
                 $post[self::GATEWAY_REFERENCE],
                 $post[self::PROMOTION_REFERENCE]
             );
 
-            $this->logger->info(__METHOD__. " Order completed");
+            $this->logger->info(__METHOD__. " Quote updated with result: ". $post[self::RESULT]);
             $this->_dispatch($post, true);
 
-            return $this->_getResponse("Order completed", $post, $orderId);
+            return $response;
         } catch (LocalizedException $le) {
             $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {
             $this->_processError($e->getMessage());
         }
-    }
-
-    private function _getResponse($message, $post, $orderId)
-    {
-        return [[
-            "message" => $message,
-            "merchantId" => $post[self::MERCHANT_ID],
-            "transactionReference" => $post[self::TRANSACTION_REFERENCE],
-            "gatewayReference" => $post[self::GATEWAY_REFERENCE],
-            "promotionReference" => $post[self::PROMOTION_REFERENCE],
-            "orderReference" => $orderId,
-            "amount" => $post[self::AMOUNT],
-        ]];
     }
 
     private function _processError($message)
@@ -141,12 +136,12 @@ class Callback
 
     private function _validateRequest($post, $signature)
     {
-        // if (empty($signature) || $signature != $this->latitudeHelper->getHMAC($post)) {
-        //     return [
-        //         "error" => true,
-        //         "message" => "Invalid signature"
-        //     ];
-        // }
+        if (empty($signature) || $signature != $this->latitudeHelper->getHMAC($post)) {
+            return [
+                "error" => true,
+                "message" => "Invalid signature"
+            ];
+        }
 
         $paymentGatewayConfig = $this->latitudeHelper->getConfig();
         if ($post[self::MERCHANT_ID] != $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID]) {

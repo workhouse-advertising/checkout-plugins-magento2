@@ -16,23 +16,24 @@ class Complete extends \Magento\Framework\App\Action\Action
     protected $cartRepository;
     protected $quoteValidator;
 
+    protected $orderAdapter;
     protected $logger;
-    /**
-     * Complete constructor.
-     * @param \Magento\Framework\App\Action\Context $context
-     */
+   
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         \Magento\Quote\Model\QuoteValidator $quoteValidator,
+        \Latitude\Checkout\Model\Adapter\Order $orderAdapter,
         \Latitude\Checkout\Logger\Logger $logger
     ) {
         $this->messageManager = $messageManager;
         $this->checkoutSession = $checkoutSession;
         $this->cartRepository = $cartRepository;
         $this->quoteValidator = $quoteValidator;
+
+        $this->orderAdapter = $orderAdapter;
         $this->logger = $logger;
 
         parent::__construct($context);
@@ -46,19 +47,18 @@ class Complete extends \Magento\Framework\App\Action\Action
             $quoteId = $this->getRequest()->getParam('reference');
 
             if (!isset($quoteId) || empty($quoteId)) {
-                $this->_redirect("checkout/cart");
+                $this->_processError("Validaion failed, quote id is mandatory", null);
                 return;
             }
 
             $quote = $this->cartRepository->get($quoteId);
             $orderId = $quote->getReservedOrderId();
+            $paymentMethod = $quote->getPayment()->getMethod();
 
-            if ($quote->getPayment()->getMethod() != LatitudeConstants::METHOD_CODE) {
-                $this->_redirect("checkout/cart");
+            if ($paymentMethod != LatitudeConstants::METHOD_CODE) {
+                $this->_processError("Validaion failed, Invalid payment method ". $paymentMethod, null);
                 return;
             }
-
-            $this->quoteValidator->validateBeforeSubmit($quote);
 
             if (!isset($orderId) || empty($orderId)) {
                 throw new LocalizedException(
@@ -66,42 +66,36 @@ class Complete extends \Magento\Framework\App\Action\Action
                 );
             }
 
-            if (boolval($quote->getIsActive())) {
+            if (!boolval($quote->getIsActive())) {
                 throw new LocalizedException(
-                    __('Could not show success for active quote')
+                    __('Could not process inactive quote')
                 );
             }
 
-            $this->logger->debug(__METHOD__. " Processing quote and redirecting to success page. Order Id: {$orderId}");
+            $createdOrderId = $this->orderAdapter->placeOrder($quoteId);
 
-            $this->checkoutSession
-            ->setLastQuoteId($quoteId)
-            ->setLastSuccessQuoteId($quoteId)
-            ->setLastOrderId($orderId)
-            ->setLastRealOrderId($orderId);
-
-            $this->checkoutSession->setLoadInactive(false);
-            $this->checkoutSession->replaceQuote($this->checkoutSession->getQuote()->save());
+            $this->checkoutSession->setLastQuoteId($quoteId)->setLastSuccessQuoteId($quoteId)->setLastOrderId($orderId)->setLastRealOrderId($orderId);
 
             $this->logger->debug(__METHOD__.
-            " order complete ".
-            " lastSuccessQuoteId: ". $this->checkoutSession->getLastSuccessQuoteId().
-            " lastQuoteId:". $this->checkoutSession->getLastQuoteId().
-            " lastOrderId:". $this->checkoutSession->getLastOrderId().
-            " lastRealOrderId:". $this->checkoutSession->getLastRealOrderId());
-        
+                " Order created with Quote Id: {$quoteId}".
+                " Order Id: {$orderId} and {$createdOrderId}");
+
             $this->_redirect('checkout/onepage/success');
         } catch (LocalizedException $le) {
-            $this->_processError($le->getRawMessage());
+            $this->_processError($le->getRawMessage(), "Your payment was not successful, please try again or select other payment method");
         } catch (\Exception $e) {
-            $this->_processError($e->getMessage());
+            $this->_processError($e->getMessage(), "Your payment was not successful, please try again or select other payment method");
         }
     }
 
-    private function _processError($message)
+    private function _processError($message, $displayMessage)
     {
         $this->logger->error(__METHOD__. " ". $message);
-        $this->messageManager->addErrorMessage("Your payment was not successful, please try again or select other payment method");
+
+        if (!empty($displayMessage)) {
+            $this->messageManager->addErrorMessage($displayMessage);
+        }
+
         $this->_redirect("checkout/cart");
     }
 }
