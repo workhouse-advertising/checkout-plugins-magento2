@@ -1,22 +1,29 @@
 <!-- Latitude Interest Free Snippet - Start -->
 <?php
-$latitudeContent = $block->getContent();
+    $latitudeContent = $block->getContent();
+    $displayType = $block->getDisplayType();
 ?>
-<div class="payment-method-note latitude-widget-container" style="font-size: 15px; margin: 10px 0px; font-weight:450; display:inline-block;">
-    <?php echo $latitudeContent["title"]; ?>
-    <span style="position:relative; top:5px; white-space:nowrap; display:inline-block;">
-        <img
-            style="height:28px"
-            src="<?php echo $latitudeContent["logoURL"]; ?>"/>
-    </span>
-        
-    <span style="position:relative; margin-left:10px; white-space:nowrap; display:inline-block;">
-        <a
-        style="position:relative; text-decoration:underline; font-weight:bold; font-size:12px; cursor:pointer; color:#3a3a3a;"
-        target="_blank"
-        href="<?php echo $latitudeContent["applyURL"]; ?>">
-            What's this?
+
+<?php if ($displayType == "full_width") : ?>
+    <div class="payment-method-note latitude-widget-container">
+        <?php echo $latitudeContent["title"]; ?>
+        <span class="latitude-widget-logo">
+            <img style="height:28px" src="<?php echo $latitudeContent["logoURL"]; ?>"/>
+        </span>
+            
+        <span class="latitude-widget-text-container">
+            <a target="_blank" href="<?php echo $latitudeContent["applyURL"]; ?>">
+                What's this?
+            </a>
+        </span>
+    </div>
+<?php endif; ?>
+
+<?php if ($displayType == "inline") : ?>
+    <span class="latitude-widget-logo">
+        <a target="_blank" href="<?php echo $latitudeContent["applyURL"]; ?>">
+            <img style="height:28px" src="<?php echo $latitudeContent["logoURL"]; ?>"/>
         </a>
     </span>
-</div>
+<?php endif; ?>
 <!-- Latitude Interest Free Snippet - End -->

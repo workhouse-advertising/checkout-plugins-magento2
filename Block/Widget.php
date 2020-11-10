@@ -26,6 +26,17 @@ class Widget extends Template
         return $this->_AUContent();
     }
 
+    public function getDisplayType()
+    {
+        $displayType = $this->latitudeHelper->getWidgetType();
+
+        if (empty($displayType)) {
+            return Latitude\Checkout\Model\Adminhtml\Source\WidgetType::DEFAULT;
+        }
+
+        return $displayType;
+    }
+
     public function _AUContent()
     {
         return [

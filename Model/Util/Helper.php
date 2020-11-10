@@ -15,6 +15,7 @@ class Helper
     const TEST_MODE = 'test_mode';
     const VERSION = "version";
     const TERMS_URL = "terms_url";
+    const WIDGET_TYPE = "widget_type";
 
     const API_URL_TEST = 'https://api.test.latitudefinancial.com/v1/applybuy-checkout-service';
     const API_URL_PROD = 'https://api.latitudefinancial.com/v1/applybuy-checkout-service';
@@ -89,6 +90,11 @@ class Helper
         return $this->_readConfig(self::TERMS_URL, true);
     }
 
+    public function getWidgetType()
+    {
+        return $this->_readConfig(self::WIDGET_TYPE);
+    }
+
     public function getHMAC($payload)
     {
         $message = "";
@@ -144,7 +150,7 @@ class Helper
     
     private function _clean($string)
     {
-        $result = preg_replace("/[^a-zA-Z0-9]+/", "", $string);
+        $result = preg_replace("/[^a-zA-Z0-9_]+/", "", $string);
         return $result;
     }
 }
