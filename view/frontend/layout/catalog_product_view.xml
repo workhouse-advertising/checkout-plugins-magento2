@@ -1,13 +1,18 @@
 <?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Latitude_Checkout::latitude.css"/>
+    </head>
     <body>
-        <referenceContainer name="product.info.addtocart">
-            <block 
-                class="Latitude\Checkout\Block\StockLeft"
-                name="Latitude.widget.top"
-                template="Latitude_Checkout::latitude/stock_left.phtml" 
-                after="-"
-            />
+      <referenceContainer name="content">
+            <referenceContainer name="product.info.main">
+                <block 
+                    class="Latitude\Checkout\Block\Widget"
+                    name="Latitude.widget.catalog"
+                    after="product.info.price"
+                    template="Latitude_Checkout::latitude/widget.phtml" 
+                />
+            </referenceContainer>
         </referenceContainer>
     </body>
 </page>

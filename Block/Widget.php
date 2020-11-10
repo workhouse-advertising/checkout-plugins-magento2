@@ -4,7 +4,7 @@ namespace Latitude\Checkout\Block;
 
 use Magento\Framework\View\Element\Template;
 
-class StockLeft extends Template
+class Widget extends Template
 {
     protected $latitudeHelper;
 
