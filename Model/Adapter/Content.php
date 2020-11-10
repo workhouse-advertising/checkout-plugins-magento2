@@ -56,7 +56,7 @@ class Content
             "image1" => "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg",
             "image2" => "",
             "heading" => "Flexible Gem Interest Free plans to suit your needs",
-            "description1" => "We’re here to help you get what you need. With plans from 6-24 months, Latitude Gem Visa has a range of Interest Free offers that work for you.",
+            "description1" => "We’re here to help you get what you need. With plans from 6-24 months, Gem Visa has a range of Interest Free offers that work for you.",
             "description2" => "You will be redirected to Gem Visa checkout to complete your order",
             "applyText" => "Not a Gem Visa customer",
             "applyURL" => "https://checkout.latitudefinancial.com/about/nz?merchantId=". $this->latitudeHelper->getMerchantId(),
