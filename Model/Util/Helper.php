@@ -123,6 +123,11 @@ class Helper
         }
     }
 
+    public function isNZMerchant()
+    {
+        return $this->storeManager->getStore()->getBaseCurrencyCode() == "NZD";
+    }
+
     private function _readConfig($path, $returnRaw = false)
     {
         $websiteId = $this->getWebsiteId();

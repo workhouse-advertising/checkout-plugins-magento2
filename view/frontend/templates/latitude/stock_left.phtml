@@ -1,20 +1,22 @@
-<!-- Latitude Interest Free (AU) Snippet - Start -->
-<div class="payment-method-note" style="font-size: 15px; margin: 10px 0px; font-weight:450; display:inline-block;">
-    Or flexible Latitude Interest Free plans to suit your needs
+<?php
+$latitudeContent = $block->getContent();
+?>
+<!-- Latitude Interest Free Snippet - Start -->
+<div class="payment-method-note latitude-widget-container" style="font-size: 15px; margin: 10px 0px; font-weight:450; display:inline-block;">
+    <?php echo $latitudeContent["title"]; ?>
     <span style="position:relative; top:5px; white-space:nowrap; display:inline-block;">
-        <!-- change height here -->
         <img
             style="height:28px"
-            src="https://assets.latitudefinancial.com/merchant-services/latitude/icon/latitude-interest-free.svg"/>
+            src="<?php echo $latitudeContent["logoURL"]; ?>"/>
     </span>
         
     <span style="position:relative; margin-left:10px; white-space:nowrap; display:inline-block;">
         <a
         style="position:relative; text-decoration:underline; font-weight:bold; font-size:12px; cursor:pointer; color:#3a3a3a;"
         target="_blank"
-        href="https://checkout.latitudefinancial.com/about/au">
-        What's this?
+        href="<?php echo $latitudeContent["applyURL"]; ?>">
+            What's this?
         </a>
     </span>
 </div>
-<!-- Latitude Interest Free (AU) Snippet - End -->
+<!-- Latitude Interest Free Snippet - End -->

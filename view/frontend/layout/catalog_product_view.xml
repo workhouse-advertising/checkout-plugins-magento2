@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="product.info.addtocart.additional">
-            <block class="Latitude\Checkout\Block\StockLeft"
-                name="Latitude.price.installments"
+        <referenceContainer name="product.info.addtocart">
+            <block 
+                class="Latitude\Checkout\Block\StockLeft"
+                name="Latitude.widget.top"
                 template="Latitude_Checkout::latitude/stock_left.phtml" 
+                after="-"
             />
         </referenceContainer>
     </body>

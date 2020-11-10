@@ -3,22 +3,21 @@ namespace Latitude\Checkout\Model\Adapter;
 
 class Content
 {
-    protected $storeManager;
     protected $latitudeHelper;
 
     public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Latitude\Checkout\Model\Util\Helper $latitudeHelper
     ) {
-        $this->storeManager = $storeManager;
         $this->latitudeHelper = $latitudeHelper;
     }
 
     public function getLogoURL()
     {
-        return $this->_isNZ() ?
-        "https://assets.latitudefinancial.com/merchant-services/latitude/icon/gem-interest-free.svg" :
-        "https://assets.latitudefinancial.com/merchant-services/latitude/icon/latitude-interest-free.svg";
+        if ($this->latitudeHelper->isNZMerchant()) {
+            return "https://assets.latitudefinancial.com/merchant-services/latitude/icon/gem-interest-free.svg";
+        }
+
+        return "https://assets.latitudefinancial.com/merchant-services/latitude/icon/latitude-interest-free.svg";
     }
 
     public function getTermsURL()
@@ -29,45 +28,38 @@ class Content
 
     public function getContent()
     {
-        return $this->_isNZ() ? $this->_getNZContent() : $this->_getAUContent();
+        if ($this->latitudeHelper->isNZMerchant()) {
+            return $this->_NZContent();
+        }
+
+        return $this->_AUContent();
     }
 
-    private function _getAUContent()
+    private function _AUContent()
     {
-        $resp['title'] = "Enjoy Now. Pay Later.";
-
-        $resp['image1'] = "https://assets.latitudefinancial.com/merchant-services/latitude/icon/interest-free-badge.svg";
-        $resp['image2'] = "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg";
-
-        $resp['heading'] = "Flexible Latitude Interest Free plans to suit your needs";
-        $resp['description1'] = "We’re here to help you get what you need. With plans from 6-24 months,
-        Latitude Gem Visa has a range of Interest Free offers that work for you.";
-        $resp['description2'] = "You will be redirected to Latitude checkout to complete your order";
-        $resp['applyText'] = "Not a Latitude customer";
-        $resp['applyURL'] = "https://checkout.latitudefinancial.com/about/au?merchantId=". $this->latitudeHelper->getMerchantId();
-
-        return $resp;
+        return [
+            "title" => "Enjoy Now. Pay Later.",
+            "image1" => "https://assets.latitudefinancial.com/merchant-services/latitude/icon/interest-free-badge.svg",
+            "image2" => "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg",
+            "heading" => "Flexible Latitude Interest Free plans to suit your needs",
+            "description1" => "We’re here to help you get what you need. With plans from 6-24 months, Latitude Gem Visa has a range of Interest Free offers that work for you.",
+            "description2" => "You will be redirected to Latitude checkout to complete your order",
+            "applyText" => "Not a Latitude customer",
+            "applyURL" => "https://checkout.latitudefinancial.com/about/au?merchantId=". $this->latitudeHelper->getMerchantId(),
+        ];
     }
 
-    private function _getNZContent()
+    private function _NZContent()
     {
-        $resp['title'] = "Enjoy Now. Pay Later.";
-
-        $resp['image1'] = "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg";
-        $resp['image2'] = "";
-
-        $resp['heading'] = "Flexible Gem Interest Free plans to suit your needs";
-        $resp['description1'] = "We’re here to help you get what you need. With plans from 6-24 months,
-        Latitude Gem Visa has a range of Interest Free offers that work for you.";
-        $resp['description2'] = "You will be redirected to Gem Visa checkout to complete your order";
-        $resp['applyText'] = "Not a Gem Visa customer";
-        $resp['applyURL'] = "https://checkout.latitudefinancial.com/about/nz?merchantId=". $this->latitudeHelper->getMerchantId();
-
-        return $resp;
-    }
-
-    private function _isNZ()
-    {
-        return $this->storeManager->getStore()->getBaseCurrencyCode() == "NZD";
+        return [
+            "title" => "Enjoy Now. Pay Later.",
+            "image1" => "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg",
+            "image2" => "",
+            "heading" => "Flexible Gem Interest Free plans to suit your needs",
+            "description1" => "We’re here to help you get what you need. With plans from 6-24 months, Latitude Gem Visa has a range of Interest Free offers that work for you.",
+            "description2" => "You will be redirected to Gem Visa checkout to complete your order",
+            "applyText" => "Not a Gem Visa customer",
+            "applyURL" => "https://checkout.latitudefinancial.com/about/nz?merchantId=". $this->latitudeHelper->getMerchantId(),
+        ];
     }
 }
