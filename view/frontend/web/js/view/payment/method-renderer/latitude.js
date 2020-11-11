@@ -29,10 +29,6 @@ define([
       return window.checkoutConfig.payment.latitude.logoURL;
     },
 
-    getTermsURL: function () {
-      return window.checkoutConfig.payment.latitude.termsURL;
-    },
-
     getContent: function () {
       return window.checkoutConfig.payment.latitude.content;
     },

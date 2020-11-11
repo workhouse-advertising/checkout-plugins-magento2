@@ -29,7 +29,6 @@ final class ConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
                         self::FRAUD => __('Fraud')
                     ],
                     'logoURL' => $this->contentAdapter->getLogoURL(),
-                    'termsURL' => $this->contentAdapter->getTermsURL(),
                     'content' => $this->contentAdapter->getContent(),
                 ]
             ]
