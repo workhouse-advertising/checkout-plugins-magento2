@@ -10,6 +10,7 @@
       data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"
     />
     <label data-bind="attr: {'for': getCode()}" class="label">
+      <span data-bind="text: getContent().heading" />
       <img
         data-bind="attr: {src: getLogoURL()}"
         class="payment-icon latitude-payment-icon"
@@ -19,14 +20,14 @@
   </div>
 
   <div class="payment-method-content latitude-payment-wrapper">
-    <p>
+    <p class="latitude-payment-text">
       <strong data-bind="text: getContent().title"></strong>
       <a target="_blank" data-bind="attr: {href: getContent().learnMoreURL}"
         >Learn more</a
       >
     </p>
 
-    <p data-bind="text: getContent().heading"></p>
+    <p class="latitude-payment-text" data-bind="text: getContent().heading"></p>
 
     <div class="latitude-content-image-container">
       <img
@@ -44,10 +45,13 @@
       <!-- /ko -->
     </div>
 
-    <p data-bind="text: getContent().description1"></p>
+    <p
+      class="latitude-payment-text"
+      data-bind="text: getContent().description1"
+    ></p>
 
     <p
-      class="latitude-content-small"
+      class="latitude-payment-text latitude-payment-text--small"
       data-bind="text: getContent().description2"
     ></p>
 
@@ -65,14 +69,14 @@
       </button>
     </div>
 
-    <p class="latitude-content-small">
+    <p class="latitude-payment-text latitude-payment-text--small">
       <span data-bind="text: getContent().applyText"></span>
       <a target="_blank" data-bind="attr: {href: getContent().applyURL}"
         >Apply here</a
       >
     </p>
 
-    <p class="latitude-content-small">
+    <p class="latitude-payment-text latitude-payment-text--small">
       By continuing, you agree to our
       <a target="_blank" data-bind="attr: {href: getContent().termsURL}"
         >Terms and conditions</a

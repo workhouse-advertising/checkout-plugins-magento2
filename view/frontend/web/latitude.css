@@ -38,7 +38,7 @@
 /* Checkout styles */
 
 .latitude-payment-wrapper {
-  padding: 10px 20px;
+  padding: 10px !important;
   max-width: 500px;
 }
 
@@ -49,11 +49,12 @@
   text-decoration: underline;
 }
 
-.latitude-payment-wrapper p {
-  margin: 14px 0;
+.latitude-payment-text {
+  margin-top: 14px !important;
+  margin-bottom: 14px !important;
 }
 
-.latitude-content-small {
+.latitude-payment-text--small {
   font-size: 12px;
   margin-bottom: 0;
 }
@@ -72,7 +73,7 @@
 }
 
 .payment-content-image {
-  height: 65px;
+  height: 65px !important;
   width: auto;
 }
 
