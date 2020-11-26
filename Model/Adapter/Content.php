@@ -35,7 +35,7 @@ class Content
         $applyURL = "https://checkout.latitudefinancial.com/about/au?merchantId=". $this->latitudeHelper->getMerchantId();
 
         return [
-            "heading" => "Latitude Interest Free",
+            "label" => "Latitude Interest Free",
             "title" => "Enjoy Now. Pay Later.",
             "image1" => "https://assets.latitudefinancial.com/merchant-services/latitude/icon/interest-free-badge.svg",
             "image2" => "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg",
@@ -55,7 +55,7 @@ class Content
         $applyURL = "https://checkout.latitudefinancial.com/about/nz?merchantId=". $this->latitudeHelper->getMerchantId();
 
         return [
-            "heading" => "Gem Interest Free",
+            "label" => "Gem Interest Free",
             "title" => "Enjoy Now. Pay Later.",
             "image1" => "https://assets.latitudefinancial.com/merchant-services/latitude/icon/shopping.svg",
             "image2" => "",
