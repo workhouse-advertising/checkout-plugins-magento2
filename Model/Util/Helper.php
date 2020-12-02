@@ -15,13 +15,13 @@ class Helper
     const TEST_MODE = 'test_mode';
     const VERSION = "version";
     const TERMS_URL = "terms_url";
-    const WIDGET_TYPE = "widget_type";
+    const PRODUCT_BANNER_LAYOUT = "product_banner_layout";
 
     const API_URL_TEST = 'https://api.test.latitudefinancial.com/v1/applybuy-checkout-service';
     const API_URL_PROD = 'https://api.latitudefinancial.com/v1/applybuy-checkout-service';
 
-    const CONTENT_API_URL_TEST = 'https://api.checkout.test.merchant-services-np.lfscnp.com/content/checkout';
-    const CONTENT_API_URL_PROD = 'https://checkout.latitudefinancial.com/api/content/checkout';
+    const CONTENT_HOST_TEST = 'https://master.checkout.test.merchant-services-np.lfscnp.com';
+    const CONTENT_HOST_PROD = 'https://checkout.latitudefinancial.com';
 
     protected $scopeConfig;
     protected $state;
@@ -75,11 +75,6 @@ class Helper
         return $this->isTestMode() ? self::API_URL_TEST : self::API_URL_PROD;
     }
 
-    public function getContentApiUrl()
-    {
-        return $this->isTestMode() ? self::CONTENT_API_URL_TEST : self::CONTENT_API_URL_PROD;
-    }
-
     public function getVersion()
     {
         return $this->_readConfig(self::VERSION, true);
@@ -90,9 +85,9 @@ class Helper
         return $this->_readConfig(self::TERMS_URL, true);
     }
 
-    public function getWidgetType()
+    public function getProductBannerLayout()
     {
-        return $this->_readConfig(self::WIDGET_TYPE);
+        return $this->_readConfig(self::PRODUCT_BANNER_LAYOUT);
     }
 
     public function getHMAC($payload)
@@ -132,6 +127,16 @@ class Helper
     public function isNZMerchant()
     {
         return $this->storeManager->getStore()->getBaseCurrencyCode() == "NZD";
+    }
+
+    public function getBaseCurrency()
+    {
+        return $this->storeManager->getStore()->getBaseCurrencyCode();
+    }
+
+    public function getScriptURL() {
+        $host = $this->isTestMode() ? self::CONTENT_HOST_TEST : self::CONTENT_HOST_PROD;
+        return $host. "/assets/content.js?platform=". LatitudeConstants::PLATFORM_TYPE ."&merchantId=". $this->getMerchantId();
     }
 
     private function _readConfig($path, $returnRaw = false)

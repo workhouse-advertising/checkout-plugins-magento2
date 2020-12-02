@@ -1,0 +1,29 @@
+<!-- Latitude Interest Free Snippet - Start -->
+<?php
+    $latitudeContent = $block->getOptions();
+?>
+<div class="payment-method-note" id="latitude-product-banner">
+</div>
+<script type="text/javascript">  
+    window.LatitudeCheckout = <?php echo $block->getOptions(); ?>;
+    window.LatitudeCheckout.container = "latitude-product-banner";
+
+    (function () {
+        function asyncLoad() {
+            var curr = document.createElement("script");
+            curr.type = "text/javascript";
+            curr.async = true;
+            curr.src = "<?php echo $block->getScriptURL(); ?>";
+        
+            var scr = document.getElementsByTagName("script")[0];
+            scr.parentNode.insertBefore(curr, scr);
+        }
+        
+        if (window.attachEvent) {
+            window.attachEvent("onload", asyncLoad);
+        } else {
+            window.addEventListener("load", asyncLoad, false);
+        }
+    })();
+</script>
+<!-- Latitude Interest Free Snippet - End -->

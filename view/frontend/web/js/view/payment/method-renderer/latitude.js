@@ -18,15 +18,41 @@ define([
 
     initObservable: function () {
       this._super().observe(["transactionResult"]);
+
+      this.setOptions();
+
       return this;
+    },
+
+    setOptions: function () {
+      window.LatitudeCheckout = window.checkoutConfig.payment.latitude.options;
+
+      window.LatitudeCheckout.container = {
+        main: "latitude-payment--main",
+        footer: "latitude-payment--footer",
+      };
+
+      var totals = quote.getTotals()();
+
+      window.LatitudeCheckout.checkout = {
+        shippingAmount: totals.base_shipping_amount,
+        discount: totals.base_discount_amount,
+        taxAmount: totals.base_tax_amount,
+        subTotal: totals.base_subtotal,
+        total: totals.base_grand_total,
+      };
+
+      $.ajax({
+        url: window.checkoutConfig.payment.latitude.scriptURL,
+        dataType: "script",
+        cache: true,
+      }).fail(function (xhr, status) {
+        console.error("Could not Load latitude content. Failed with " + status);
+      });
     },
 
     getCode: function () {
       return "latitude";
-    },
-
-    getLogoURL: function () {
-      return window.checkoutConfig.payment.latitude.logoURL;
     },
 
     getContent: function () {

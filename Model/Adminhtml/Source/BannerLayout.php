@@ -3,15 +3,15 @@ namespace Latitude\Checkout\Model\Adminhtml\Source;
 
 use Magento\Framework\Option\ArrayInterface;
 
-class WidgetType implements ArrayInterface
+class BannerLayout implements ArrayInterface
 {
-    const DEFAULT = "full_width";
+    const DEFAULT = "fullwidth";
 
     public function toOptionArray()
     {
         return [
             [
-                'value' => "full_width",
+                'value' => "fullwidth",
                 'label' => __('Full width'),
             ],
             [

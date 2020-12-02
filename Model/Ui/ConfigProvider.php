@@ -7,12 +7,18 @@ final class ConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
     const SUCCESS = 0;
     const FRAUD = 1;
 
-    protected $contentAdapter;
+    const LABEL_AU = "Latitude Interest Free";
+    const LABEL_NZ = "Gem Interest Free";
+
+    const LOGO_AU = "https://assets.latitudefinancial.com/merchant-services/latitude/icon/latitude-interest-free.svg";
+    const LOGO_NZ = "https://assets.latitudefinancial.com/merchant-services/latitude/icon/gem-interest-free.svg";
+
+    protected $latitudeHelper;
 
     public function __construct(
-        \Latitude\Checkout\Model\Adapter\Content $contentAdapter
+        \Latitude\Checkout\Model\Util\Helper $latitudeHelper
     ) {
-        $this->contentAdapter = $contentAdapter;
+        $this->latitudeHelper = $latitudeHelper;
     }
 
     /**
@@ -21,15 +27,26 @@ final class ConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
      */
     public function getConfig()
     {
+        $isNZ = $this->latitudeHelper->isNZMerchant();
+
         return [
-            'payment' => [
+            "payment" => [
                 self::CODE => [
-                    'transactionResults' => [
+                    "transactionResults" => [
                         self::SUCCESS => __('Success'),
                         self::FRAUD => __('Fraud')
                     ],
-                    'logoURL' => $this->contentAdapter->getLogoURL(),
-                    'content' => $this->contentAdapter->getContent(),
+                    "content" => [
+                        "label" => $isNZ ? self::LABEL_NZ : self::LABEL_AU,
+                        "logoURL" => $isNZ ? self::LOGO_NZ : self::LOGO_AU,
+                        "termsURL" => $this->latitudeHelper->getTermsUrl(),
+                    ],
+                    "options" => [
+                        "merchantId" => $this->latitudeHelper->getMerchantId(),
+                        "page" => "checkout",
+                        "currency" => $this->latitudeHelper->getBaseCurrency()
+                    ],
+                    "scriptURL" => $this->latitudeHelper->getScriptURL()
                 ]
             ]
         ];

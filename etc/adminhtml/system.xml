@@ -34,10 +34,10 @@
                     <label>Terms and conditions</label>
                     <config_path>payment/latitude/terms_url</config_path>
                 </field>
-                <field id="widget_type" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Widget type</label>
-                    <config_path>payment/latitude/widget_type</config_path>
-                    <source_model>Latitude\Checkout\Model\Adminhtml\Source\WidgetType</source_model>
+                <field id="product_banner_layout" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Product banner layout</label>
+                    <config_path>payment/latitude/product_banner_layout</config_path>
+                    <source_model>Latitude\Checkout\Model\Adminhtml\Source\BannerLayout</source_model>
                 </field>
             </group>
         </section>
