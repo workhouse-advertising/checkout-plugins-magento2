@@ -39,7 +39,6 @@ final class ConfigProvider implements \Magento\Checkout\Model\ConfigProviderInte
                     "content" => [
                         "label" => $isNZ ? self::LABEL_NZ : self::LABEL_AU,
                         "logoURL" => $isNZ ? self::LOGO_NZ : self::LOGO_AU,
-                        "termsURL" => $this->latitudeHelper->getTermsUrl(),
                     ],
                     "options" => [
                         "merchantId" => $this->latitudeHelper->getMerchantId(),

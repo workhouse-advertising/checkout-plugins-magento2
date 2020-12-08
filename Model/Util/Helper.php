@@ -14,7 +14,6 @@ class Helper
     const MERCHANT_SECRET = 'merchant_secret';
     const TEST_MODE = 'test_mode';
     const VERSION = "version";
-    const TERMS_URL = "terms_url";
     const PRODUCT_BANNER_LAYOUT = "product_banner_layout";
 
     const API_URL_TEST = 'https://api.test.latitudefinancial.com/v1/applybuy-checkout-service';
@@ -78,11 +77,6 @@ class Helper
     public function getVersion()
     {
         return $this->_readConfig(self::VERSION, true);
-    }
-
-    public function getTermsUrl()
-    {
-        return $this->_readConfig(self::TERMS_URL, true);
     }
 
     public function getProductBannerLayout()
