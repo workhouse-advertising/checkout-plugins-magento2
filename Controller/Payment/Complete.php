@@ -74,7 +74,7 @@ class Complete extends \Magento\Framework\App\Action\Action
 
             $createdOrderId = $this->orderAdapter->placeOrder($quoteId);
 
-            $this->checkoutSession->setLastQuoteId($quoteId)->setLastSuccessQuoteId($quoteId)->setLastOrderId($orderId)->setLastRealOrderId($orderId);
+            $this->checkoutSession->setLastQuoteId($quoteId)->setLastSuccessQuoteId($quoteId)->setLastOrderId($createdOrderId)->setLastRealOrderId($createdOrderId);
 
             $this->logger->debug(__METHOD__.
                 " Order created with Quote Id: {$quoteId}".
