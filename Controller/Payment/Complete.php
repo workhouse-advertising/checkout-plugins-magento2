@@ -72,13 +72,21 @@ class Complete extends \Magento\Framework\App\Action\Action
                 );
             }
 
-            $createdOrderId = $this->orderAdapter->placeOrder($quoteId);
+            $order = $this->orderAdapter->placeOrder($quoteId);
 
-            $this->checkoutSession->setLastQuoteId($quoteId)->setLastSuccessQuoteId($quoteId)->setLastOrderId($createdOrderId)->setLastRealOrderId($createdOrderId);
+            $this->checkoutSession->setLastOrderId($order->getId())
+            ->setLastQuoteId($quoteId)
+            ->setLastSuccessQuoteId($quoteId)
+            ->setLastOrderId($order->getId())
+            ->setLastRealOrderId($order->getIncrementId())
+            ->setLastOrderStatus($order->getStatus());
 
             $this->logger->debug(__METHOD__.
                 " Order created with Quote Id: {$quoteId}".
-                " Order Id: {$orderId} and {$createdOrderId}");
+                " Order Id: {$order->getId()}".
+                " Order Increment Id: {$order->getIncrementId()}".
+                " Order Status: {$order->getStatus()}"
+            );
 
             $this->_redirect('checkout/onepage/success');
         } catch (LocalizedException $le) {

@@ -101,7 +101,7 @@ class Order
                 break;
         }
 
-        return $order->getId();
+        return $order;
     }
 
     private function _getQuoteById($quoteId)
