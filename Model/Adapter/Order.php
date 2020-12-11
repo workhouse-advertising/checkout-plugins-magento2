@@ -13,13 +13,16 @@ class Order
     protected $emailSender;
     protected $checkoutSession;
 
+    protected $latitudeHelper;
+
     public function __construct(
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         \Magento\Quote\Api\CartManagementInterface $quoteManagement,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Quote\Model\QuoteValidator $quoteValidator,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailSender,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Latitude\Checkout\Model\Util\Helper $latitudeHelper
     ) {
         $this->cartRepository = $cartRepository;
         $this->quoteManagement = $quoteManagement;
@@ -27,6 +30,8 @@ class Order
         $this->quoteValidator = $quoteValidator;
         $this->emailSender = $emailSender;
         $this->checkoutSession = $checkoutSession;
+
+        $this->latitudeHelper = $latitudeHelper;
     }
 
     public function addTransactionInfo($quoteId, $amount, $transactionReference, $gatewayReference, $promotionReference)
@@ -65,7 +70,10 @@ class Order
         $transactionRef = $quotePayment->getAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE);
         $promotionRef = $quotePayment->getAdditionalInformation(LatitudeConstants::PROMOTION_REFERENCE);
 
-        if (empty($gatewayRef) || empty($transactionRef) || empty($promotionRef)) {
+
+        if (!$this->latitudeHelper->isInsecureMode() && (
+            empty($gatewayRef) || empty($transactionRef) || empty($promotionRef)
+        )) {
             $paymentDetails = $this->jsonHelper->jsonEncode($quotePayment->getAdditionalInformation());
             throw new LocalizedException(__("Could not find payment details for for quote ". $quoteId. ", payment details: ". $paymentDetails));
         }

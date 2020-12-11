@@ -15,6 +15,7 @@ class Helper
     const TEST_MODE = 'test_mode';
     const VERSION = "version";
     const PRODUCT_BANNER_LAYOUT = "product_banner_layout";
+    const INSECURE_MODE = "insecure_mode";
 
     const API_URL_TEST = 'https://api.test.latitudefinancial.com/v1/applybuy-checkout-service';
     const API_URL_PROD = 'https://api.latitudefinancial.com/v1/applybuy-checkout-service';
@@ -84,6 +85,11 @@ class Helper
         return $this->_readConfig(self::PRODUCT_BANNER_LAYOUT);
     }
 
+    public function isInsecureMode()
+    {
+        return $this->isTestMode() && boolval($this->_readConfig(self::INSECURE_MODE));
+    }
+
     public function getHMAC($payload)
     {
         $message = "";
@@ -128,7 +134,8 @@ class Helper
         return $this->storeManager->getStore()->getBaseCurrencyCode();
     }
 
-    public function getScriptURL() {
+    public function getScriptURL()
+    {
         $host = $this->isTestMode() ? self::CONTENT_HOST_TEST : self::CONTENT_HOST_PROD;
         return $host. "/assets/content.js?platform=". LatitudeConstants::PLATFORM_TYPE ."&merchantId=". $this->getMerchantId();
     }

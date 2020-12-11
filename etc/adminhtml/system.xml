@@ -31,9 +31,14 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="product_banner_layout" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Product banner layout</label>
+                    <label>Product Banner Layout</label>
                     <config_path>payment/latitude/product_banner_layout</config_path>
                     <source_model>Latitude\Checkout\Model\Adminhtml\Source\BannerLayout</source_model>
+                </field>
+                <field id="insecure_mode" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Is Insecure Mode ?</label>
+                    <config_path>payment/latitude/insecure_mode</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
         </section>
