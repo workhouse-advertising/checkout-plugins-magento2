@@ -1,12 +1,11 @@
 <!-- Latitude Interest Free Snippet - Start -->
-<?php
-    $latitudeContent = $block->getOptions();
-?>
-<div class="payment-method-note" id="latitude-product-banner">
-</div>
+<?php if ($block->showContainer()): ?>
+    <div class="payment-method-note" id="latitude-banner-container"></div>
+<?php endif; ?>
+
 <script type="text/javascript">  
     window.LatitudeCheckout = <?php echo $block->getOptions(); ?>;
-    window.LatitudeCheckout.container = "latitude-product-banner";
+    window.LatitudeCheckoutOverride = <?php echo $block->getOverride(); ?>;
 
     (function () {
         function asyncLoad() {

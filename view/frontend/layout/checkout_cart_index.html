@@ -7,7 +7,11 @@
                 name="Latitude.banner.cart"
                 after="checkout.cart.shortcut.buttons"
                 template="Latitude_Checkout::latitude/banner.phtml" 
-            />
+            >
+                <arguments>
+                    <argument name="page" xsi:type="string">cart</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

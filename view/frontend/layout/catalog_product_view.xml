@@ -8,7 +8,11 @@
                     name="Latitude.banner.catalog"
                     after="product.info.price"
                     template="Latitude_Checkout::latitude/banner.phtml" 
-                />
+                >
+                    <arguments>
+                        <argument name="page" xsi:type="string">product</argument>
+                    </arguments>
+                </block>
             </referenceContainer>
         </referenceContainer>
     </body>

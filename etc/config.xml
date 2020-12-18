@@ -8,8 +8,7 @@
                 <merchant_id />
                 <merchant_secret backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <test_mode>1</test_mode>
-                <version>v0.1.41</version>
-                <product_banner_layout>fullwidth</product_banner_layout>
+                <version>v0.1.42</version>
                 <order_status>pending</order_status>
                 <payment_action>sale</payment_action>
                 <title>Latitude Interest Free</title>
@@ -22,6 +21,7 @@
                 <can_void>1</can_void>
                 <can_use_checkout>1</can_use_checkout>
                 <is_gateway>1</is_gateway>
+                <advanced_config />
             </latitude>
         </payment>
     </default>

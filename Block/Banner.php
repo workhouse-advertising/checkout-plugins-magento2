@@ -18,24 +18,21 @@ class Banner extends Template
     ) {
         $this->registry = $registry;
         $this->latitudeHelper = $latitudeHelper;
+
+        $this->page = isset($data['page']) ? $data['page']: 0;
+
         parent::__construct($context, $data);
     }
 
     public function getOptions()
     {
-        $layout = $this->latitudeHelper->getProductBannerLayout();
-
-        if (empty($layout)) {
-            return Latitude\Checkout\Model\Adminhtml\Source\BannerLayout::DEFAULT;
-        }
-
         $product = $this->getCurrentProduct();
-        
+
         return json_encode([
             "merchantId" => $this->latitudeHelper->getMerchantId(),
             "currency" => $this->latitudeHelper->getBaseCurrency(),
-            "page" => "product",
-            "layout" => $layout,
+            "container" => $this->showContainer() ? "latitude-banner-container" : "",
+            "page" => $this->getPage(),
             "product" => [
                 "id" => $product->getId(),
                 "name" =>  $product->getName(),
@@ -46,9 +43,27 @@ class Banner extends Template
         ]);
     }
 
-    public function getScriptURL()
-    {
+    public function getPage() {
+        return $this->page;
+    }
+
+    public function showContainer() {
+        return $this->getPage() === "product";
+    }
+
+    public function getScriptURL() {
         return $this->latitudeHelper->getScriptURL();
+    }
+
+    public function getOverride()
+    {
+        $data = $this->latitudeHelper->getAdvancedConfig();
+
+        if (!empty($data) && json_decode($data) !== null) {
+            return json_encode(json_decode($data));
+        }
+
+        return json_encode("");
     }
 
     protected function getPrice()

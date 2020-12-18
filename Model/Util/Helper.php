@@ -14,12 +14,12 @@ class Helper
     const MERCHANT_SECRET = 'merchant_secret';
     const TEST_MODE = 'test_mode';
     const VERSION = "version";
-    const PRODUCT_BANNER_LAYOUT = "product_banner_layout";
+    const ADVANCED_CONFIG = "advanced_config";
 
     const API_URL_TEST = 'https://api.test.latitudefinancial.com/v1/applybuy-checkout-service';
     const API_URL_PROD = 'https://api.latitudefinancial.com/v1/applybuy-checkout-service';
 
-    const CONTENT_HOST_TEST = 'https://master.checkout.test.merchant-services-np.lfscnp.com';
+    const CONTENT_HOST_TEST = 'https://master.dev.merchant-services-np.lfscnp.com';
     const CONTENT_HOST_PROD = 'https://checkout.latitudefinancial.com';
 
     protected $scopeConfig;
@@ -79,9 +79,9 @@ class Helper
         return $this->_readConfig(self::VERSION, true);
     }
 
-    public function getProductBannerLayout()
+    public function getAdvancedConfig()
     {
-        return $this->_readConfig(self::PRODUCT_BANNER_LAYOUT);
+        return $this->_readConfig(self::ADVANCED_CONFIG, true);
     }
 
     public function getHMAC($payload)
