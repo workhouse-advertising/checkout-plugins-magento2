@@ -19,7 +19,7 @@ class Helper
     const API_URL_TEST = 'https://api.test.latitudefinancial.com/v1/applybuy-checkout-service';
     const API_URL_PROD = 'https://api.latitudefinancial.com/v1/applybuy-checkout-service';
 
-    const CONTENT_HOST_TEST = 'https://master.test.merchant-services-np.lfscnp.com';
+    const CONTENT_HOST_TEST = 'https://master.checkout.test.merchant-services-np.lfscnp.com';
     const CONTENT_HOST_PROD = 'https://checkout.latitudefinancial.com';
 
     protected $scopeConfig;
