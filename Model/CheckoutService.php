@@ -35,7 +35,7 @@ class CheckoutService
             $responseStatusCode = $this->curlClient->getStatus();
             $responseBody = $this->curlClient->getBody();
 
-            if ($this->latitudeHelper->isTestMode()) {
+            if ($this->latitudeHelper->isDebugMode()) {
                 $this->logger->info($url . " (REQUEST): ". json_encode($payload, JSON_UNESCAPED_SLASHES));
                 $this->logger->info($url . " (RESPONSE STATUS CODE): ". $responseStatusCode);
                 $this->logger->info($url . " (RESPONSE BODY): ". json_encode($responseBody, JSON_UNESCAPED_SLASHES));

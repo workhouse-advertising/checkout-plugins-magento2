@@ -20,6 +20,9 @@
                         <label>Is Active ?</label>
                         <config_path>payment/latitude/active</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[When disabled, payment option would not be available on checkout page.]]>
+                        </comment>
                     </field>
 
                     <field id="merchant_id" translate="label" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
@@ -33,10 +36,22 @@
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     </field>
                     
-                    <field id="debug" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="test_mode" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Is Test Mode ?</label>
                         <config_path>payment/latitude/test_mode</config_path>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[When enabled, sends requests to our sandbox environment.]]>
+                        </comment>
+                    </field>
+
+                    <field id="debug_mode" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Is Debug Mode ?</label>
+                        <config_path>payment/latitude/debug_mode</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[When enabled, adds extra information in logs.]]>
+                        </comment>
                     </field>
                 </group>
 

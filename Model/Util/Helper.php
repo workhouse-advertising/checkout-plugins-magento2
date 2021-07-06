@@ -13,6 +13,7 @@ class Helper
     const MERCHANT_ID = 'merchant_id';
     const MERCHANT_SECRET = 'merchant_secret';
     const TEST_MODE = 'test_mode';
+    const DEBUG_MODE = 'debug_mode';
     const VERSION = "version";
     const ADVANCED_CONFIG = "advanced_config";
 
@@ -55,6 +56,7 @@ class Helper
         $config[self::ACTIVE] = boolval($this->_readConfig(self::ACTIVE));
         $config[self::MERCHANT_ID] = $this->_readConfig(self::MERCHANT_ID);
         $config[self::TEST_MODE] = boolval($this->_readConfig(self::TEST_MODE));
+        $config[self::DEBUG_MODE] = boolval($this->_readConfig(self::DEBUG_MODE));
 
         return $config;
     }
@@ -72,6 +74,11 @@ class Helper
     public function isTestMode()
     {
         return boolval($this->_readConfig(self::TEST_MODE));
+    }
+
+    public function isDebugMode()
+    {
+        return $this->isTestMode() || boolval($this->_readConfig(self::DEBUG_MODE));
     }
 
     public function getApiUrl()
