@@ -64,6 +64,11 @@ class Helper
         return $this->_readConfig(self::MERCHANT_ID);
     }
 
+    public function getMerchantSecret()
+    {
+        return $this->_readConfig(self::MERCHANT_SECRET);
+    }
+
     public function isTestMode()
     {
         return boolval($this->_readConfig(self::TEST_MODE));
@@ -126,6 +131,11 @@ class Helper
     public function getBaseCurrency()
     {
         return $this->storeManager->getStore()->getBaseCurrencyCode();
+    }
+
+    public function getStoreBaseUrl()
+    {
+        return $this->storeManager->getStore()->getBaseUrl();
     }
 
     public function getScriptURL() {

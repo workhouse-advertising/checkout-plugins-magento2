@@ -25,19 +25,30 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $_infoBlockType = 'Latitude\Checkout\Block\Info';
 
-    public function refund($payment, $amount)
+    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $this->_getLogger()->info(__METHOD__ .
-            " Refund requested for refund for Amount: {$amount}");
+        $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
 
-        throw new LocalizedException(
-            __('Could not process refund')
-        );
+        if ($refundResponse["error"]) {
+            throw new LocalizedException(
+                __("Could not process refund, ". $refundResponse["message"].". Please check the logs for more information.")
+            );
+
+            return;
+        }
+        
+        return $this;
     }
 
     private function _getLogger()
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         return $objectManager->get("\Latitude\Checkout\Logger\Logger");
+    }
+
+    private function _getRefundAdapter()
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        return $objectManager->get("Latitude\Checkout\Model\Adapter\Refund");
     }
 }
