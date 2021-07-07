@@ -30,15 +30,17 @@ class CheckoutService
             $this->_setOptions();
 
             $url = $this->latitudeHelper->getApiUrl() . $endpoint;
-            $this->curlClient->post($url, json_encode($payload, JSON_UNESCAPED_SLASHES));
+            $requestBody = json_encode($payload, JSON_UNESCAPED_SLASHES);
+
+            $this->curlClient->post($url, $requestBody);
 
             $responseStatusCode = $this->curlClient->getStatus();
-            $responseBody = $this->curlClient->getBody();
+            $responseBody = json_decode($this->curlClient->getBody());
 
             if ($this->latitudeHelper->isDebugMode()) {
-                $this->logger->info($url . " (REQUEST): ". json_encode($payload, JSON_UNESCAPED_SLASHES));
+                $this->logger->info($url . " (REQUEST): ". $requestBody);
                 $this->logger->info($url . " (RESPONSE STATUS CODE): ". $responseStatusCode);
-                $this->logger->info($url . " (RESPONSE BODY): ". json_encode($responseBody, JSON_UNESCAPED_SLASHES));
+                $this->logger->info($url . " (RESPONSE BODY): ". json_encode($responseBody));
             }
 
             if ($responseStatusCode < 200 || $responseStatusCode > 299) {
