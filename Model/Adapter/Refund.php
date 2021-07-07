@@ -13,6 +13,11 @@ class Refund
     protected $latitudeConvert;
     protected $latitudeCheckoutService;
 
+    const ERROR = "error";
+    const MESSAGE = "message";
+    const BODY = "body";
+    const RESULT = "result";
+
     public function __construct(
         \Latitude\Checkout\Logger\Logger $logger,
         LatitudeHelper $latitudeHelper,
@@ -34,9 +39,15 @@ class Refund
             $order = $payment->getOrder();
             $creditMemo = $payment->getCreditmemo();
 
+            $parentTransactionId = $payment->getParentTransactionId();
+
             $gatewayReference = $payment->getAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE);
             $transactionReference = $payment->getAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE);
             $promotionReference = $payment->getAdditionalInformation(LatitudeConstants::PROMOTION_REFERENCE);
+
+            if (empty($parentTransactionId)) {
+                return $this->_handleError("failed to parent transaction id.");
+            }
 
             if (empty($order)) {
                 return $this->_handleError("failed to get order.");
@@ -61,18 +72,18 @@ class Refund
 
             $this->logger->info(__METHOD__ . " preparing request");
         
-            $refundRequest = $this->_prepareRequest($amount, $order, $creditMemo, $gatewayReference);
+            $refundRequest = $this->_prepareRequest($amount, $order, $creditMemo, $parentTransactionId, $gatewayReference);
             $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
 
-            if ($refundResponse["error"]) {
-                return $this->_handleError($refundResponse["message"]);
+            if ($refundResponse[self::REFUND]) {
+                return $this->_handleError($refundResponse[self::MESSAGE]);
             }
 
-            if ($refundResponse["body"]["result"] != LatitudeConstants::TRANSACTION_RESULT_COMPLETED) {
-                return $this->_handleError($refundResponse["body"]["error"]);
+            if ($refundResponse[self::BODY][self::RESULT] != LatitudeConstants::TRANSACTION_RESULT_COMPLETED) {
+                return $this->_handleError($refundResponse[self::BODY][self::REFUND]);
             }
 
-            return $this->_handleSuccess($refundResponse["body"]);
+            return $this->_handleSuccess($refundResponse[self::BODY]);
         } catch (LocalizedException $le) {
             return $this->_handleError($le->getRawMessage());
         } catch (\Exception $e) {
@@ -83,8 +94,8 @@ class Refund
     private function _handleSuccess($body)
     {
         return [
-            "error" => false,
-            "body" => $body
+            self::REFUND => false,
+            self::BODY => $body
         ];
     }
 
@@ -93,12 +104,12 @@ class Refund
         $this->logger->error(__METHOD__. " ". $message);
 
         return [
-            "error" => true,
-            "message" => $message
+            self::REFUND => true,
+            self::MESSAGE => $message
         ];
     }
 
-    private function _prepareRequest($amount, $order, $creditMemo, $gatewayReference)
+    private function _prepareRequest($amount, $order, $creditMemo, $parentTransactionId, $gatewayReference)
     {
         $paymentGatewayConfig = $this->latitudeHelper->getConfig();
 
@@ -106,7 +117,7 @@ class Refund
             "merchantId" => $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID],
             "isTest" =>  $paymentGatewayConfig[LatitudeHelper::TEST_MODE],
             "gatewayReference" => $gatewayReference,
-            "merchantReference" => $order->getIncrementId(),
+            "merchantReference" => $parentTransactionId,
             "amount" => $this->latitudeConvert->toPrice($amount),
             "currency" => $order->getOrderCurrencyCode(),
             "type" => LatitudeConstants::TRANSACTION_TYPE_REFUND,
