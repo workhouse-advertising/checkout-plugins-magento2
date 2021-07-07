@@ -65,7 +65,10 @@ class Refund
 
             $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
 
-            if($refundResponse["error"]) {
+            if (
+                array_key_exists("error", $refundResponse) &&
+                $refundResponse["error"]
+            ) {
                 return $this->_handleError($refundResponse["message"]);
             }
 
@@ -76,12 +79,20 @@ class Refund
                 return $this->_handleError($refundResponse["message"]);
             }
 
-            return $refundResponse;
+            return $this->_handleSuccess($refundResponse);
         } catch (LocalizedException $le) {
             return $this->_handleError($le->getRawMessage());
         } catch (\Exception $e) {
             return $this->_handleError($e->getMessage());
         }
+    }
+
+    private function _handleSuccess($message)
+    {
+        return [
+            "error" => false,
+            "message" => $message
+        ];
     }
 
     private function _handleError($message)
