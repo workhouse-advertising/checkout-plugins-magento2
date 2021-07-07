@@ -76,7 +76,7 @@ class Refund
                 array_key_exists("result", $refundResponse) &&
                 $refundResponse["result"] != LatitudeConstants::TRANSACTION_RESULT_COMPLETED
                 ) {
-                return $this->_handleError($refundResponse["message"]);
+                return $this->_handleError($refundResponse["error"]);
             }
 
             return $this->_handleSuccess($refundResponse);

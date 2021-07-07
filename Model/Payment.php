@@ -25,6 +25,8 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $_infoBlockType = 'Latitude\Checkout\Block\Info';
 
+    const ERROR = 'error';
+    const MESSAGE = 'message';
     const TRANSACTION_REFERENCE = 'transaction_reference';
     const GATEWAY_REFERENCE = 'gateway_reference';
 
@@ -32,16 +34,16 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
 
-        if ($refundResponse["error"]) {
+        if ($refundResponse[self::ERROR]) {
             throw new LocalizedException(
-                __("Could not process refund, ". $refundResponse["message"].". Please check the logs for more information.")
+                __("Could not process refund, ". $refundResponse[self::MESSAGE].". Please check the logs for more information.")
             );
 
             return;
         }
 
-        $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::TRANSACTION_REFERENCE]);
-        $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::GATEWAY_REFERENCE]);
+        $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::MESSAGE][self::TRANSACTION_REFERENCE]);
+        $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::MESSAGE][self::GATEWAY_REFERENCE]);
         $payment->save();
         
         return $this;
