@@ -36,20 +36,18 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
         try {
             $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
 
-            $this->_getLogger()->info("refund processed");
-
             if ($refundResponse[self::ERROR]) {
                 throw new LocalizedException(__($refundResponse[self::MESSAGE]));
             }
 
-            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::BODY][LatitudeConstants::TRANSACTION_REFERENCE]);
-            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::BODY][LatitudeConstants::GATEWAY_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::BODY][self::BODY][LatitudeConstants::TRANSACTION_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::BODY][self::BODY][LatitudeConstants::GATEWAY_REFERENCE]);
             
             $payment->save();
         } catch (LocalizedException $le) {
             $this->_handleError(self::REFUND, $le->getRawMessage());
         } catch (\Exception $e) {
-            $this->_handleError(self::REFUND, $le->getRawMessage());
+            $this->_handleError(self::REFUND, $e->getRawMessage());
         }
        
         return $this;
