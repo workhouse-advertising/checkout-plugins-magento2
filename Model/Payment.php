@@ -42,6 +42,9 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
                 throw new LocalizedException(__($refundResponse[self::MESSAGE]));
             }
 
+            $refundId = $refundResponse[self::BODY][self::GATEWAY_REFERENCE]. "-". $refundResponse[self::BODY][self::TRANSACTION_REFERENCE];
+
+            $payment->setTransactionId($refundId);
             $payment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, [
                 LatitudeConstants::TRANSACTION_REFERENCE => $refundResponse[self::BODY][self::TRANSACTION_REFERENCE],
                 LatitudeConstants::GATEWAY_REFERENCE => $refundResponse[self::BODY][self::GATEWAY_REFERENCE],
