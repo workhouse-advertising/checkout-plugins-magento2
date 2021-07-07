@@ -35,7 +35,7 @@ class CheckoutService
             $this->curlClient->post($url, $requestBody);
 
             $responseStatusCode = $this->curlClient->getStatus();
-            $responseBody = json_decode($this->curlClient->getBody());
+            $responseBody = json_decode($this->curlClient->getBody(), true);
 
             if ($this->latitudeHelper->isDebugMode()) {
                 $this->logger->info($url . " (REQUEST): ". $requestBody);
@@ -90,7 +90,7 @@ class CheckoutService
 
         return [
             "error" => false,
-            "body" => json_decode($body)
+            "body" => $body
         ];
     }
 
