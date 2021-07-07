@@ -64,9 +64,13 @@ class Refund
             $refundRequest = $this->_prepareRequest($amount, $order, $creditMemo, $gatewayReference);
             $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
 
+            $this->logger->error(__METHOD__. " ". $refundResponse);
+
             if ($refundResponse["error"]) {
                 return $this->_handleError($refundResponse["message"]);
             }
+            
+            $this->logger->error(__METHOD__. " ". $refundResponse);
 
             if (
                 isset($refundResponse["body"]) &&
