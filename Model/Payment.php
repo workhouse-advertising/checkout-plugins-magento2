@@ -30,6 +30,8 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     const BODY = 'body';
 
     const REFUND = 'refund';
+    const TRANSACTION_REFERENCE = "transactionReference";
+    const GATEWAY_REFERENCE = "gatewayReference";
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -40,8 +42,8 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
                 throw new LocalizedException(__($refundResponse[self::MESSAGE]));
             }
 
-            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::BODY][LatitudeConstants::TRANSACTION_REFERENCE]);
-            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::BODY][LatitudeConstants::GATEWAY_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::BODY][self::TRANSACTION_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::BODY][self::GATEWAY_REFERENCE]);
         } catch (LocalizedException $le) {
             $this->_handleError(self::REFUND, $le->getRawMessage());
         } catch (\Exception $e) {
