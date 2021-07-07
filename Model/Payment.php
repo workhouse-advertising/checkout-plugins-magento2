@@ -25,6 +25,9 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     protected $_infoBlockType = 'Latitude\Checkout\Block\Info';
 
+    const TRANSACTION_REFERENCE = 'transaction_reference';
+    const GATEWAY_REFERENCE = 'gateway_reference';
+
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
@@ -36,6 +39,10 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
             return;
         }
+
+        $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::TRANSACTION_REFERENCE]);
+        $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::GATEWAY_REFERENCE]);
+        $payment->save();
         
         return $this;
     }
