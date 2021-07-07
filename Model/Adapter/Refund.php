@@ -72,7 +72,7 @@ class Refund
                 return $this->_handleError($refundResponse["body"]["error"]);
             }
 
-            return $this->_handleSuccess($refundResponse);
+            return $this->_handleSuccess($refundResponse["body"]);
         } catch (LocalizedException $le) {
             return $this->_handleError($le->getRawMessage());
         } catch (\Exception $e) {

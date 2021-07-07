@@ -40,14 +40,14 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
                 throw new LocalizedException(__($refundResponse[self::MESSAGE]));
             }
 
-            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::BODY][self::BODY][LatitudeConstants::TRANSACTION_REFERENCE]);
-            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::BODY][self::BODY][LatitudeConstants::GATEWAY_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::BODY][LatitudeConstants::TRANSACTION_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::BODY][LatitudeConstants::GATEWAY_REFERENCE]);
             
             $payment->save();
         } catch (LocalizedException $le) {
-            $this->_handleError(self::REFUND, $le->getRawMessage());
+            $this->_processError($le->getRawMessage());
         } catch (\Exception $e) {
-            $this->_handleError(self::REFUND, $e->getRawMessage());
+            $this->_processError($e->getMessage());
         }
        
         return $this;
