@@ -29,7 +29,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     const MESSAGE = 'message';
     const BODY = 'body';
 
-    const REFUND = 'Refund';
+    const REFUND = 'refund';
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -66,7 +66,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     private function _handleError($transactionType, $message)
     {
         throw new LocalizedException(
-            __($transactionType. " failed with error [". $message. "]. Please check logs more information.")
+            __("Could not process ". $transactionType. ". ". $message)
         );
     }
 }
