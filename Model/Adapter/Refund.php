@@ -40,13 +40,12 @@ class Refund
             $creditMemo = $payment->getCreditmemo();
 
             $parentTransactionId = $payment->getParentTransactionId();
-
             $gatewayReference = $payment->getAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE);
             $transactionReference = $payment->getAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE);
             $promotionReference = $payment->getAdditionalInformation(LatitudeConstants::PROMOTION_REFERENCE);
 
             if (empty($parentTransactionId)) {
-                return $this->_handleError("failed to parent transaction id.");
+                return $this->_handleError("failed to get parent transaction id.");
             }
 
             if (empty($order)) {
@@ -68,7 +67,7 @@ class Refund
 
             $this->logger->info(__METHOD__ . " preparing request");
         
-            $refundRequest = $this->_prepareRequest($amount, $order, $creditMemo, $parentTransactionId, $gatewayReference);
+            $refundRequest = $this->_prepareRequest($amount, $order, $creditMemo, $gatewayReference);
             $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
 
             if ($refundResponse[self::ERROR]) {
@@ -105,7 +104,7 @@ class Refund
         ];
     }
 
-    private function _prepareRequest($amount, $order, $creditMemo, $parentTransactionId, $gatewayReference)
+    private function _prepareRequest($amount, $order, $creditMemo, $gatewayReference)
     {
         $paymentGatewayConfig = $this->latitudeHelper->getConfig();
 
@@ -113,7 +112,7 @@ class Refund
             "merchantId" => $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID],
             "isTest" =>  $paymentGatewayConfig[LatitudeHelper::TEST_MODE],
             "gatewayReference" => $gatewayReference,
-            "merchantReference" => $parentTransactionId,
+            "merchantReference" => $order->getIncrementId(),
             "amount" => $this->latitudeConvert->toPrice($amount),
             "currency" => $order->getOrderCurrencyCode(),
             "type" => LatitudeConstants::TRANSACTION_TYPE_REFUND,
