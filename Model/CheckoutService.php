@@ -90,7 +90,7 @@ class CheckoutService
 
         return [
             "error" => false,
-            "body" => $body
+            "body" => json_decode($body)
         ];
     }
 
