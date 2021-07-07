@@ -27,25 +27,31 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     const ERROR = 'error';
     const MESSAGE = 'message';
-    const TRANSACTION_REFERENCE = 'transaction_reference';
-    const GATEWAY_REFERENCE = 'gateway_reference';
+
+    const REFUND = 'Refund';
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
+        try {
+            $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
 
-        if ($refundResponse[self::ERROR]) {
-            throw new LocalizedException(
-                __("Could not process refund, ". $refundResponse[self::MESSAGE].". Please check the logs for more information.")
-            );
+            if ($refundResponse[self::ERROR]) {
+                $this->_handleError(self::REFUND, $refundResponse[self::MESSAGE]);
+            }
 
-            return;
+            $this->_getLogger->info("refund processed");
+            $this->_getLogger->info(\json_encode($refundResponse));
+
+            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::MESSAGE][LatitudeConstants::TRANSACTION_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::MESSAGE][LatitudeConstants::GATEWAY_REFERENCE]);
+            
+            $payment->save();
+        } catch (LocalizedException $le) {
+            $this->_handleError(self::REFUND, $le->getRawMessage());
+        } catch (\Exception $e) {
+            $this->_handleError(self::REFUND, $le->getRawMessage());
         }
-
-        $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::MESSAGE][self::TRANSACTION_REFERENCE]);
-        $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::MESSAGE][self::GATEWAY_REFERENCE]);
-        $payment->save();
-        
+       
         return $this;
     }
 
@@ -59,5 +65,12 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         return $objectManager->get("Latitude\Checkout\Model\Adapter\Refund");
+    }
+
+    private function _handleError($transactionType, $message)
+    {
+        throw new LocalizedException(
+            __($transactionType. " failed with error [". $message. "]. Please check logs more information.")
+        );
     }
 }

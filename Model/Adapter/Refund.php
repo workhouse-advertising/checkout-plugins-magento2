@@ -67,6 +67,7 @@ class Refund
 
             if (
                 array_key_exists("error", $refundResponse) &&
+                is_bool($refundResponse["error"]) &&
                 $refundResponse["error"]
             ) {
                 return $this->_handleError($refundResponse["message"]);
