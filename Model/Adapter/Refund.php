@@ -66,7 +66,7 @@ class Refund
             $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
 
             if (
-                array_key_exists("error", $refundResponse) &&
+                isset($refundResponse["error"]) &&
                 is_bool($refundResponse["error"]) &&
                 $refundResponse["error"]
             ) {
@@ -74,7 +74,7 @@ class Refund
             }
 
             if (
-                array_key_exists("result", $refundResponse) &&
+                isset($refundResponse["result"]) &&
                 $refundResponse["result"] != LatitudeConstants::TRANSACTION_RESULT_COMPLETED
                 ) {
                 return $this->_handleError($refundResponse["error"]);
