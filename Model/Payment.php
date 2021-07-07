@@ -27,6 +27,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     const ERROR = 'error';
     const MESSAGE = 'message';
+    const BODY = 'body';
 
     const REFUND = 'Refund';
 
@@ -36,13 +37,13 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
             $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
 
             if ($refundResponse[self::ERROR]) {
-                $this->_handleError(self::REFUND, $refundResponse[self::MESSAGE]);
+                throw new LocalizedException(__($refundResponse[self::MESSAGE]));
             }
 
             $this->_getLogger->info("refund processed");
 
-            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::MESSAGE][LatitudeConstants::TRANSACTION_REFERENCE]);
-            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::MESSAGE][LatitudeConstants::GATEWAY_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::BODY][LatitudeConstants::TRANSACTION_REFERENCE]);
+            $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::BODY][LatitudeConstants::GATEWAY_REFERENCE]);
             
             $payment->save();
         } catch (LocalizedException $le) {

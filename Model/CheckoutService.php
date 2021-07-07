@@ -47,7 +47,7 @@ class CheckoutService
                 return $this->_handleError("Status ". $responseStatusCode. " does not indicate success");
             }
 
-            return $responseBody;
+            return $this->_handleSuccess($responseBody);
         } catch (\Exception $e) {
             return $this->_handleError($e->getMessage());
         }
@@ -82,6 +82,16 @@ class CheckoutService
         );
 
         $this->curlClient->setOptions($options);
+    }
+
+    private function _handleSuccess($body)
+    {
+        $this->logger->info(__METHOD__. " ". json_encode($body));
+
+        return [
+            "error" => false,
+            "body" => $body
+        ];
     }
 
     private function _handleError($message)
