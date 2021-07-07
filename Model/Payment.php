@@ -40,7 +40,6 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
             }
 
             $this->_getLogger->info("refund processed");
-            $this->_getLogger->info(\json_encode($refundResponse));
 
             $payment->setAdditionalInformation(LatitudeConstants::TRANSACTION_REFERENCE, $refundResponse[self::MESSAGE][LatitudeConstants::TRANSACTION_REFERENCE]);
             $payment->setAdditionalInformation(LatitudeConstants::GATEWAY_REFERENCE, $refundResponse[self::MESSAGE][LatitudeConstants::GATEWAY_REFERENCE]);

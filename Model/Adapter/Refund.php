@@ -65,6 +65,8 @@ class Refund
 
             $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
 
+            $this->logger->info("(refundResponse): ". json_encode($refundResponse));
+
             if (
                 isset($refundResponse["error"]) &&
                 is_bool($refundResponse["error"]) &&
@@ -90,6 +92,8 @@ class Refund
 
     private function _handleSuccess($message)
     {
+        $this->logger->error(__METHOD__. " ". json_encode($message));
+
         return [
             "error" => false,
             "message" => $message
