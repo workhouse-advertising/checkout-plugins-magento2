@@ -62,10 +62,6 @@ class Refund
                 return $this->_handleError("failed to get additional info ". $encodedAdditionalInfo);
             }
 
-            if (empty($payment->getParentTransactionId())) {
-                return $this->_handleError("parent transaction id is empty");
-            }
-
             if ($order->getPayment()->getMethod() != LatitudeConstants::METHOD_CODE) {
                 return $this->_handleError("invalid method code");
             }
@@ -75,12 +71,12 @@ class Refund
             $refundRequest = $this->_prepareRequest($amount, $order, $creditMemo, $parentTransactionId, $gatewayReference);
             $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
 
-            if ($refundResponse[self::REFUND]) {
+            if ($refundResponse[self::ERROR]) {
                 return $this->_handleError($refundResponse[self::MESSAGE]);
             }
 
             if ($refundResponse[self::BODY][self::RESULT] != LatitudeConstants::TRANSACTION_RESULT_COMPLETED) {
-                return $this->_handleError($refundResponse[self::BODY][self::REFUND]);
+                return $this->_handleError($refundResponse[self::BODY][self::ERROR]);
             }
 
             return $this->_handleSuccess($refundResponse[self::BODY]);
@@ -94,7 +90,7 @@ class Refund
     private function _handleSuccess($body)
     {
         return [
-            self::REFUND => false,
+            self::ERROR => false,
             self::BODY => $body
         ];
     }
@@ -104,7 +100,7 @@ class Refund
         $this->logger->error(__METHOD__. " ". $message);
 
         return [
-            self::REFUND => true,
+            self::ERROR => true,
             self::MESSAGE => $message
         ];
     }
