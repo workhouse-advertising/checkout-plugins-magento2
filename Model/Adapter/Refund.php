@@ -4,20 +4,24 @@ namespace Latitude\Checkout\Model\Adapter;
 use \Magento\Framework\Exception\LocalizedException as LocalizedException;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
+use \Latitude\Checkout\Model\Util\Convert as LatitudeConvert;
 
 class Refund
 {
     protected $logger;
     protected $latitudeHelper;
+    protected $latitudeConvert;
     protected $latitudeCheckoutService;
 
     public function __construct(
         \Latitude\Checkout\Logger\Logger $logger,
         LatitudeHelper $latitudeHelper,
+        LatitudeConvert $latitudeConvert,
         \Latitude\Checkout\Model\CheckoutService $latitudeCheckoutService
     ) {
         $this->logger = $logger;
         $this->latitudeHelper = $latitudeHelper;
+        $this->latitudeConvert = $latitudeConvert;
         $this->latitudeCheckoutService = $latitudeCheckoutService;
     }
 
@@ -99,7 +103,7 @@ class Refund
             "isTest" =>  $paymentGatewayConfig[LatitudeHelper::TEST_MODE],
             "gatewayReference" => $gatewayReference,
             "merchantReference" => $order->getIncrementId(),
-            "amount" => $amount,
+            "amount" => $this->latitudeConvert->toPrice($amount),
             "currency" => $order->getOrderCurrencyCode(),
             "type" => LatitudeConstants::TRANSACTION_TYPE_REFUND,
             "description" => "",
