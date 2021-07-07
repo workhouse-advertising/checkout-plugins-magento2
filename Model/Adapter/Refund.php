@@ -64,19 +64,11 @@ class Refund
             $refundRequest = $this->_prepareRequest($amount, $order, $creditMemo, $gatewayReference);
             $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
 
-            $this->logger->error(__METHOD__. " ". json_encode($refundResponse));
-
             if ($refundResponse["error"]) {
                 return $this->_handleError($refundResponse["message"]);
             }
 
-            $this->logger->error(__METHOD__. " ". json_encode($refundResponse));
-
-            if (
-                isset($refundResponse["body"]) &&
-                isset($refundResponse["body"]["result"]) &&
-                $refundResponse["body"]["result"] != LatitudeConstants::TRANSACTION_RESULT_COMPLETED
-                ) {
+            if ($refundResponse["body"]["result"] != LatitudeConstants::TRANSACTION_RESULT_COMPLETED) {
                 return $this->_handleError($refundResponse["body"]["error"]);
             }
 
