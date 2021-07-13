@@ -13,6 +13,9 @@ class CheckoutService
     protected $logger;
     protected $latitudeHelper;
 
+    const ENDPOINT_PURCHASE = "/purchase";
+    const ENDPOINT_REFUND = "/refund";
+
     public function __construct(
         \Magento\Framework\HTTP\Client\Curl $curlClient,
         \Latitude\Checkout\Logger\Logger $logger,

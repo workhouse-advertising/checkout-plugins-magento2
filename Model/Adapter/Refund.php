@@ -2,9 +2,12 @@
 namespace Latitude\Checkout\Model\Adapter;
 
 use \Magento\Framework\Exception\LocalizedException as LocalizedException;
+
+use \Latitude\Checkout\Logger\Logger as LatitudeLogger;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 use \Latitude\Checkout\Model\Util\Convert as LatitudeConvert;
+use \Latitude\Checkout\Model\CheckoutService as LatitudeCheckoutService;
 
 class Refund
 {
@@ -19,10 +22,10 @@ class Refund
     const RESULT = "result";
 
     public function __construct(
-        \Latitude\Checkout\Logger\Logger $logger,
+        LatitudeLogger $logger,
         LatitudeHelper $latitudeHelper,
         LatitudeConvert $latitudeConvert,
-        \Latitude\Checkout\Model\CheckoutService $latitudeCheckoutService
+        LatitudeCheckoutService $latitudeCheckoutService
     ) {
         $this->logger = $logger;
         $this->latitudeHelper = $latitudeHelper;
@@ -68,7 +71,7 @@ class Refund
             $this->logger->info(__METHOD__ . " preparing request");
         
             $refundRequest = $this->_prepareRequest($amount, $order, $creditMemo, $gatewayReference);
-            $refundResponse = $this->latitudeCheckoutService->post("/refund", $refundRequest);
+            $refundResponse = $this->latitudeCheckoutService->post(LatitudeCheckoutService::ENDPOINT_REFUND, $refundRequest);
 
             if ($refundResponse[self::ERROR]) {
                 return $this->_handleError($refundResponse[self::MESSAGE]);
