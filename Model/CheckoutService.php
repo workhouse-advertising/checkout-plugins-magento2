@@ -29,6 +29,10 @@ class CheckoutService
     public function post($endpoint, $payload)
     {
         try {
+            if ($this->latitudeHelper->isDebugMode()) {
+                $this->logger->info("preparing request for POST:". $endpoint);
+            }
+
             $this->_setHeaders();
             $this->_setOptions();
 
@@ -81,7 +85,6 @@ class CheckoutService
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS      => 10,
             CURLOPT_TIMEOUT        => 30,
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1
         );
 
         $this->curlClient->setOptions($options);

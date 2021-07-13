@@ -105,26 +105,7 @@ define([
           var data = response;
 
           var redirectToPortal = function (paymentRequest) {
-            var form = document.createElement("form");
-
-            form.method = "POST";
-            form.action = paymentRequest.url;
-            form.style.display = "none";
-
-            Object.keys(paymentRequest).forEach((key) => {
-              if (key === "url" || key === "success") {
-                return;
-              }
-
-              var elem = document.createElement("input");
-              elem.name = key;
-              elem.value = paymentRequest[key];
-              form.appendChild(elem);
-            });
-
-            document.body.appendChild(form);
-
-            form.submit();
+            window.location.href = paymentRequest["url"]
           };
 
           if (

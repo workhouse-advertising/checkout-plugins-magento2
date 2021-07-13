@@ -20,8 +20,13 @@ class Process extends \Magento\Framework\App\Action\Action
     protected $_quoteValidator;
 
     protected $_latitudeHelper;
-    protected $_paymentRequestAdaptor;
+    protected $_purchaseAdapter;
     protected $_logger;
+
+    const ERROR = "error";
+    const MESSAGE = "message";
+    const BODY = "body";
+    const REDIRECT_URL = "redirectUrl";
 
     /**
      * Process constructor.
@@ -34,7 +39,7 @@ class Process extends \Magento\Framework\App\Action\Action
         \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
         \Magento\Quote\Model\QuoteValidator $quoteValidator,
         LatitudeHelper $latitudeHelper,
-        \Latitude\Checkout\Model\Adapter\PaymentRequest $paymentRequestAdaptor,
+        \Latitude\Checkout\Model\Adapter\Purchase $purchaseAdapter,
         \Latitude\Checkout\Logger\Logger $logger
     ) {
         $this->_checkoutSession = $checkoutSession;
@@ -44,7 +49,7 @@ class Process extends \Magento\Framework\App\Action\Action
         $this->_quoteValidator = $quoteValidator;
 
         $this->_latitudeHelper = $latitudeHelper;
-        $this->_paymentRequestAdaptor = $paymentRequestAdaptor;
+        $this->_purchaseAdapter = $purchaseAdapter;
         $this->_logger = $logger;
 
         parent::__construct($context);
@@ -53,12 +58,19 @@ class Process extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         try {
-            $paymentRequest = $this->_processCapture();
+            $purchaseResponse = $this->_processPurchase();
 
-            $paymentRequest['success'] = true;
-            $paymentRequest['url'] = $this->_latitudeHelper->getApiUrl(). "/purchase";
+            if ($purchaseResponse[self::ERROR]) {
+                throw new LocalizedException(__($purchaseResponse[self::MESSAGE]));
+            }
 
-            $result = $this->_jsonResultFactory->create()->setData($paymentRequest);
+            $result = $this->_jsonResultFactory->create()->setData([
+                "success" => true,
+                "url" => $purchaseResponse[self::BODY][self::REDIRECT_URL],
+                "platformType" => LatitudeConstants::PLATFORM_TYPE,
+                "platformVersion" => $this->_latitudeHelper->getPlatformVersion(),
+                "pluginVersion" => $this->_latitudeHelper->getVersion(),
+            ]);
 
             return $result;
         } catch (LocalizedException $le) {
@@ -72,17 +84,20 @@ class Process extends \Magento\Framework\App\Action\Action
     {
         $this->_logger->error(__METHOD__. $message);
 
-        $result['success'] = false;
-        $result['message'] = $message;
-
-        $result = $this->_jsonResultFactory->create()->setData($result);
+        $result = $this->_jsonResultFactory->create()->setData([
+            "success" => false,
+            "message" =>  $message,
+            "platformType" => LatitudeConstants::PLATFORM_TYPE,
+            "platformVersion" => $this->_latitudeHelper->getPlatformVersion(),
+            "pluginVersion" => $this->_latitudeHelper->getVersion(),
+        ]);
 
         return $result;
     }
 
-    public function _processCapture()
+    public function _processPurchase()
     {
-        $this->_logger->debug(__METHOD__. " Processing capture");
+        $this->_logger->debug(__METHOD__. " Preparing purchase");
         
         $post = $this->getRequest()->getPostValue();
         $cartId = htmlspecialchars($post['cartId'], ENT_QUOTES);
@@ -166,8 +181,6 @@ class Process extends \Magento\Framework\App\Action\Action
 
         $this->_logger->info(__METHOD__. " Quote saved. Quote id: {$quoteId}");
 
-        $paymentRequest = $this->_paymentRequestAdaptor->get($quote, $quoteId);
-
-        return $paymentRequest;
+        return $this->_purchaseAdapter->process($quote, $quoteId);
     }
 }
