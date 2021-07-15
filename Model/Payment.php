@@ -32,6 +32,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     const REFUND = 'refund';
     const TRANSACTION_REFERENCE = "transactionReference";
     const GATEWAY_REFERENCE = "gatewayReference";
+    const TRANSACTION_TYPE = "transactionType";
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -42,9 +43,11 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
                 throw new LocalizedException(__($refundResponse[self::MESSAGE]));
             }
 
-            $refundId = $refundResponse[self::BODY][self::GATEWAY_REFERENCE]. "-". $refundResponse[self::BODY][self::TRANSACTION_REFERENCE];
+            $transactionId = $refundResponse[self::BODY][self::GATEWAY_REFERENCE]. "-".
+                $refundResponse[self::BODY][self::TRANSACTION_REFERENCE]. "-".
+                $refundResponse[self::BODY][self::TRANSACTION_TYPE];
 
-            $payment->setTransactionId($refundId);
+            $payment->setTransactionId($transactionId);
             $payment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $refundResponse[self::BODY]);
 
             $payment->save();

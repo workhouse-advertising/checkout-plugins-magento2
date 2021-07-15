@@ -7,7 +7,7 @@ use \Latitude\Checkout\Logger\Logger as LatitudeLogger;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 use \Latitude\Checkout\Model\Util\Convert as LatitudeConvert;
-use \Latitude\Checkout\Model\CheckoutService as LatitudeCheckoutService;
+use \Latitude\Checkout\Model\Adapter\CheckoutService as LatitudeCheckoutService;
 
 class Purchase
 {
@@ -46,7 +46,7 @@ class Purchase
 
     public function process($quote, $quoteId)
     {
-        $this->logger->info(__METHOD__ . " initiating purchase");
+        $this->logger->debug(__METHOD__. " Begin");
 
         try {
             $purchaseRequest = $this->_prepareRequest($quote, $quoteId);

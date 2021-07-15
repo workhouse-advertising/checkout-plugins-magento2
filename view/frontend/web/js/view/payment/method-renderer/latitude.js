@@ -105,6 +105,7 @@ define([
           var data = response;
 
           var redirectToPortal = function (paymentRequest) {
+            $("body").trigger("processStart");
             window.location.href = paymentRequest["url"]
           };
 

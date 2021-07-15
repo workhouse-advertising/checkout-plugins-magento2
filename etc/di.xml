@@ -11,8 +11,4 @@
             </argument>
         </arguments>
     </type>
-    <preference 
-        for="Latitude\Checkout\Api\CallbackInterface" 
-        type="Latitude\Checkout\Api\Callback" 
-        />
 </config>

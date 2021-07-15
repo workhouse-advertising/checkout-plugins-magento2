@@ -16,8 +16,18 @@ class Complete extends \Magento\Framework\App\Action\Action
     protected $cartRepository;
     protected $quoteValidator;
 
-    protected $orderAdapter;
+    protected $purchaseVerifyAdapter;
     protected $logger;
+
+    const ERROR = "error";
+    const MESSAGE = "message";
+    const BODY = "body";
+    const ORDER = "order";
+
+    const REFERENCE = "reference";
+    const MERCHANT_REFERENCE = "merchantReference";
+    const GATEWAY_REFERENCE = "gatewayReference";
+    const TRANSACTION_REFERENCE = "transactionReference";
    
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -25,7 +35,7 @@ class Complete extends \Magento\Framework\App\Action\Action
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         \Magento\Quote\Model\QuoteValidator $quoteValidator,
-        \Latitude\Checkout\Model\Adapter\Order $orderAdapter,
+        \Latitude\Checkout\Model\Adapter\PurchaseVerify $purchaseVerifyAdapter,
         \Latitude\Checkout\Logger\Logger $logger
     ) {
         $this->messageManager = $messageManager;
@@ -33,7 +43,7 @@ class Complete extends \Magento\Framework\App\Action\Action
         $this->cartRepository = $cartRepository;
         $this->quoteValidator = $quoteValidator;
 
-        $this->orderAdapter = $orderAdapter;
+        $this->purchaseVerifyAdapter = $purchaseVerifyAdapter;
         $this->logger = $logger;
 
         parent::__construct($context);
@@ -44,36 +54,18 @@ class Complete extends \Magento\Framework\App\Action\Action
         $this->logger->debug(__METHOD__. " Begin");
 
         try {
-            $quoteId = $this->getRequest()->getParam('reference');
+            $parsed = $this->_parseRequest();
 
-            if (!isset($quoteId) || empty($quoteId)) {
-                $this->_processError("Validaion failed, quote id is mandatory", null);
-                return;
+            $verifyResponse = $this->purchaseVerifyAdapter->verifyAndCreateOrder($parsed);
+
+            if ($verifyResponse[self::ERROR]) {
+                throw new LocalizedException(__($verifyResponse[self::MESSAGE]));
             }
 
-            $quote = $this->cartRepository->get($quoteId);
-            $orderId = $quote->getReservedOrderId();
-            $paymentMethod = $quote->getPayment()->getMethod();
-
-            if ($paymentMethod != LatitudeConstants::METHOD_CODE) {
-                $this->_processError("Validaion failed, Invalid payment method ". $paymentMethod, null);
-                return;
+            $order = $verifyResponse[self::ORDER];
+            if (!isset($order)) {
+                throw new LocalizedException("Invalid order");
             }
-
-            if (!isset($orderId) || empty($orderId)) {
-                throw new LocalizedException(
-                    __('Could not get order id for '. $quoteId)
-                );
-            }
-
-            if (!boolval($quote->getIsActive())) {
-                throw new LocalizedException(
-                    __('Could not process inactive quote')
-                );
-            }
-
-            $order = $this->orderAdapter->placeOrder($quoteId);
-
 
             $this->checkoutSession->setLastQuoteId($order->getQuoteId());
             $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
@@ -81,8 +73,9 @@ class Complete extends \Magento\Framework\App\Action\Action
             $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
             $this->checkoutSession->setLastOrderStatus($order->getStatus());
 
-            $this->logger->debug(__METHOD__.
-                " Order created with Quote Id: {$quoteId}".
+            $this->logger->debug(
+                __METHOD__.
+                " Order created with Quote Id: {$merchantReference}".
                 " Order Id: {$order->getId()}".
                 " Order Increment Id: {$order->getIncrementId()}".
                 " Order Status: {$order->getStatus()}"
@@ -94,6 +87,29 @@ class Complete extends \Magento\Framework\App\Action\Action
         } catch (\Exception $e) {
             $this->_processError($e->getMessage(), "Your payment was not successful, please try again or select other payment method");
         }
+    }
+
+    private function _parseRequest()
+    {
+        $parsed = [
+            self::REFERENCE => $this->getRequest()->getParam(self::REFERENCE),
+            self::MERCHANT_REFERENCE => $this->getRequest()->getParam(self::MERCHANT_REFERENCE),
+            self::GATEWAY_REFERENCE => $this->getRequest()->getParam(self::GATEWAY_REFERENCE),
+            self::TRANSACTION_REFERENCE => $this->getRequest()->getParam(self::TRANSACTION_REFERENCE),
+        ];
+
+        if (
+            empty($parsed[self::REFERENCE]) ||
+            empty($parsed[self::MERCHANT_REFERENCE]) ||
+            empty($parsed[self::GATEWAY_REFERENCE]) ||
+            empty($parsed[self::TRANSACTION_REFERENCE])
+         ) {
+            throw new LocalizedException(
+                __("Validation failed, reference, merchantReference, gatewayReference or transactionReference are mandatory")
+            );
+        }
+
+        return $parsed;
     }
 
     private function _processError($message, $displayMessage)

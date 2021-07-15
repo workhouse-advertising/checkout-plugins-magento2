@@ -7,7 +7,7 @@ use \Latitude\Checkout\Logger\Logger as LatitudeLogger;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
 use \Latitude\Checkout\Model\Util\Helper as LatitudeHelper;
 use \Latitude\Checkout\Model\Util\Convert as LatitudeConvert;
-use \Latitude\Checkout\Model\CheckoutService as LatitudeCheckoutService;
+use \Latitude\Checkout\Model\Adapter\CheckoutService as LatitudeCheckoutService;
 
 class Refund
 {
@@ -20,7 +20,7 @@ class Refund
     const MESSAGE = "message";
     const BODY = "body";
     const RESULT = "result";
-
+    
     public function __construct(
         LatitudeLogger $logger,
         LatitudeHelper $latitudeHelper,
@@ -35,8 +35,7 @@ class Refund
 
     public function process(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $this->logger->info(__METHOD__ .
-            " initiating refund");
+        $this->logger->debug(__METHOD__. " Begin");
 
         try {
             $order = $payment->getOrder();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Latitude\Checkout\Model;
+namespace Latitude\Checkout\Model\Adapter;
 
 use \Magento\Framework\Exception\LocalizedException as LocalizedException;
 use \Latitude\Checkout\Model\Util\Constants as LatitudeConstants;
@@ -14,6 +14,7 @@ class CheckoutService
     protected $latitudeHelper;
 
     const ENDPOINT_PURCHASE = "/purchase";
+    const ENDPOINT_PURCHASE_VERIFY = "/purchase/verify";
     const ENDPOINT_REFUND = "/refund";
 
     public function __construct(
@@ -28,6 +29,8 @@ class CheckoutService
 
     public function post($endpoint, $payload)
     {
+        $this->logger->debug(__METHOD__. " Begin");
+
         try {
             if ($this->latitudeHelper->isDebugMode()) {
                 $this->logger->info("preparing request for POST:". $endpoint);
@@ -72,6 +75,7 @@ class CheckoutService
             'Authorization' => $authToken,
             "Content-Type" => "application/json",
             "Referer" => $storeBaseUrl,
+            "Expect:" => "100-continue",
         ];
 
         $this->curlClient->setHeaders($headers);
