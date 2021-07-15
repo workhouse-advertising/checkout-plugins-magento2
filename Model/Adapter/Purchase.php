@@ -24,6 +24,7 @@ class Purchase
     const MESSAGE = "message";
     const BODY = "body";
     const RESULT = "result";
+    const REDIRECT_URL = "redirectUrl";
 
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManagerInterface,
@@ -58,8 +59,8 @@ class Purchase
                 return $this->_handleError($purchaseResponse[self::MESSAGE]);
             }
 
-            if ($purchaseResponse[self::BODY][self::RESULT] != LatitudeConstants::TRANSACTION_RESULT_PENDING) {
-                return $this->_handleError($purchaseResponse[self::BODY][self::ERROR]);
+            if (empty($purchaseResponse[self::BODY][self::REDIRECT_URL])) {
+                return $this->_handleError("redirect url is empty");
             }
 
             return $this->_handleSuccess($purchaseResponse[self::BODY]);
