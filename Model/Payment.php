@@ -36,7 +36,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $transactionType = [self::REFUND];
+        $transactionType = self::REFUND;
 
         try {
             $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
