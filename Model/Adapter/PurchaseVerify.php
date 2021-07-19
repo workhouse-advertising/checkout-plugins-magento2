@@ -86,12 +86,12 @@ class PurchaseVerify {
             $verifyResponse = $this->latitudeCheckoutService->post(LatitudeCheckoutService::ENDPOINT_PURCHASE_VERIFY, $payload);
 
             if ($verifyResponse[self::ERROR]) {
-                return $this->_handleError($refundResponse[self::MESSAGE]);
+                return $this->_handleError($verifyResponse[self::MESSAGE]);
             }
 
             $validateResult = $this->_validateVerifyResponse($verifyResponse[self::BODY]);
             if ($validateResult[self::ERROR]) {
-                return $this->_handleError($refundResponse[self::MESSAGE]);
+                return $this->_handleError($verifyResponse[self::MESSAGE]);
             }
 
             if ($verifyResponse[self::BODY][self::RESULT] == LatitudeConstants::TRANSACTION_RESULT_FAILED) {
@@ -105,8 +105,7 @@ class PurchaseVerify {
 
             $this->eventManager->dispatch(LatitudeConstants::EVENT_COMPLETED, $payload);
 
-            // return order params here to set session
-            return $this->_handleSuccess($refundResponse[self::BODY], $order);
+            return $this->_handleSuccess($verifyResponse[self::BODY], $order);
         } catch (LocalizedException $le) {
             return $this->_handleError($le->getRawMessage());
         } catch (\Exception $e) {
@@ -153,12 +152,12 @@ class PurchaseVerify {
             throw new LocalizedException(__("Could not create order for quote ". $quoteId));
         }
 
-        $transactionId = $gatewayReference. "-". $transactionReference. "-". $verifyResponse[self::TRANSACTION_TYPE];
+        $purchaseTransactionId = $gatewayReference. "-". $transactionReference. "-". $verifyResponse[self::TRANSACTION_TYPE];
 
         $orderPayment = $order->getPayment();
         $orderPayment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $verifyResponse);
         
-        $orderPayment->setTransactionId($gatewayReference)->setParentTransactionId($quotePayment->getTransactionId());
+        $orderPayment->setTransactionId($purchaseTransactionId)->setParentTransactionId($payment->getTransactionId());
 
         // TODO: skip this step for authorisation trans type
         $orderPayment->setIsTransactionClosed(false)->registerCaptureNotification($order->getBaseGrandTotal());

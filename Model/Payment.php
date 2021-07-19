@@ -36,6 +36,8 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        $transactionType = [self::REFUND];
+
         try {
             $refundResponse = $this->_getRefundAdapter()->process($payment, $amount);
 
@@ -45,16 +47,16 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
 
             $transactionId = $refundResponse[self::BODY][self::GATEWAY_REFERENCE]. "-".
                 $refundResponse[self::BODY][self::TRANSACTION_REFERENCE]. "-".
-                $refundResponse[self::BODY][self::TRANSACTION_TYPE];
+                $transactionType;
 
             $payment->setTransactionId($transactionId);
             $payment->setTransactionAdditionalInfo(\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS, $refundResponse[self::BODY]);
 
             $payment->save();
         } catch (LocalizedException $le) {
-            $this->_handleError(self::REFUND, $le->getRawMessage());
+            $this->_handleError($transactionType, $le->getRawMessage());
         } catch (\Exception $e) {
-            $this->_handleError(self::REFUND, $e->getMessage());
+            $this->_handleError($transactionType, $e->getMessage());
         }
        
         return $this;

@@ -75,7 +75,7 @@ class Complete extends \Magento\Framework\App\Action\Action
 
             $this->logger->debug(
                 __METHOD__.
-                " Order created with Quote Id: {$merchantReference}".
+                " Order created with Quote Id: {$order->getQuoteId()}".
                 " Order Id: {$order->getId()}".
                 " Order Increment Id: {$order->getIncrementId()}".
                 " Order Status: {$order->getStatus()}"
