@@ -9,7 +9,7 @@
                 <merchant_secret backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <test_mode>1</test_mode>
                 <debug_mode>1</debug_mode>
-                <version>v0.1.44</version>
+                <version>v1.0.0</version>
                 <order_status>pending</order_status>
                 <payment_action>sale</payment_action>
                 <title>Latitude Interest Free</title>
