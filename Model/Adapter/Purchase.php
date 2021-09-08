@@ -91,6 +91,7 @@ class Purchase
 
         return [
             "merchantId" => $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID],
+            "storeMid" => $paymentGatewayConfig[LatitudeHelper::STORE_MERCHANT_ID],
             "isTest" =>  $paymentGatewayConfig[LatitudeHelper::TEST_MODE],
             "merchantReference" => isset($quoteId) ? $quoteId : $quote->getIncrementId(),
             "amount" => $this->latitudeConvert->toPrice($quote->getGrandTotal()),
