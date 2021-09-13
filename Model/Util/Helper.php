@@ -166,7 +166,7 @@ class Helper
     
     private function _clean($string)
     {
-        $result = preg_replace("/[^a-zA-Z0-9_]+/", "", $string);
+        $result = preg_replace("/[^a-zA-Z0-9_\-]+/", "", $string);
         return $result;
     }
 }
