@@ -161,9 +161,11 @@ class Helper
     {
         $websiteId = $this->getWebsiteId();
         $rootNode = 'payment/' . LatitudeConstants::METHOD_CODE;
-    
+
         if (!empty($websiteId) && $websiteId) {
-            $val = $this->scopeConfig->getValue($rootNode . '/' . $path, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES, $websiteId);
+            // Fallback to the store scope if nothing is found at the website level.
+            $val = $this->scopeConfig->getValue($rootNode . '/' . $path, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES, $websiteId) 
+                ?? $this->scopeConfig->getValue($rootNode . '/' . $path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->storeManager->getStore()->getStoreCode());
         } else {
             $val = $this->scopeConfig->getValue($rootNode . '/' . $path, 'default');
         }
