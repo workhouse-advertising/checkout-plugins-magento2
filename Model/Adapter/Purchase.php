@@ -126,15 +126,15 @@ class Purchase
 
     private function _getEmail($quote)
     {
-        if (!empty($quote->getCustomerEmail()) {
+        if (!empty($quote->getCustomerEmail())) {
             return (string)$quote->getCustomerEmail();
         }
 
-        if (!empty($quote->getShippingAddress()->getEmail()) {
+        if (!empty($quote->getShippingAddress()->getEmail())) {
             return (string)$quote->getShippingAddress()->getEmail();
         }
 
-        if (!empty($quote->getBillingAddress()->getEmail()) {
+        if (!empty($quote->getBillingAddress()->getEmail())) {
             return (string)$quote->getBillingAddress()->getEmail();
         }
 

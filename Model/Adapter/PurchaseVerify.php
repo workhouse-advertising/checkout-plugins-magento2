@@ -145,7 +145,7 @@ class PurchaseVerify {
         $payment->save();
 
         $this->_handleCustomerEmail($quote);
-        $this->_ignoreAddressValidation($quote)
+        $this->_ignoreAddressValidation($quote);
         
         $quote->save();
 
@@ -213,16 +213,16 @@ class PurchaseVerify {
     }
 
     private function _handleCustomerEmail($quote) {
-        if (!empty($quote->getCustomerEmail()) {
+        if (!empty($quote->getCustomerEmail())) {
             return;
         }
 
-        if (!empty($quote->getShippingAddress()->getEmail()) {
+        if (!empty($quote->getShippingAddress()->getEmail())) {
             $quote->setCustomerEmail((string)$quote->getShippingAddress()->getEmail());
             return;
         }
 
-        if (!empty($quote->getBillingAddress()->getEmail()) {
+        if (!empty($quote->getBillingAddress()->getEmail())) {
             $quote->setCustomerEmail((string)$quote->getBillingAddress()->getEmail());
             return;
         }
