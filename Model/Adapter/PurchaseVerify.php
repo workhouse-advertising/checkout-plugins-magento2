@@ -143,6 +143,10 @@ class PurchaseVerify {
         $payment->setAdditionalInformation(LatitudeConstants::PROMOTION_REFERENCE, $promotionReference);
 
         $payment->save();
+
+        $this->_handleCustomerEmail($quote);
+        $this->_ignoreAddressValidation($quote);
+        
         $quote->save();
 
         $this->quoteValidator->validateBeforeSubmit($quote);
@@ -206,6 +210,30 @@ class PurchaseVerify {
         }
 
         return $quote;
+    }
+
+    private function _handleCustomerEmail($quote) {
+        if (!empty($quote->getCustomerEmail())) {
+            return;
+        }
+
+        if (!empty($quote->getShippingAddress()->getEmail())) {
+            $quote->setCustomerEmail((string)$quote->getShippingAddress()->getEmail());
+            return;
+        }
+
+        if (!empty($quote->getBillingAddress()->getEmail())) {
+            $quote->setCustomerEmail((string)$quote->getBillingAddress()->getEmail());
+            return;
+        }
+    }
+
+    private function _ignoreAddressValidation($quote) {
+        $quote->getBillingAddress()->setShouldIgnoreValidation(true);
+
+        if (!$quote->getIsVirtual()) {
+            $quote->getShippingAddress()->setShouldIgnoreValidation(true);
+        }
     }
 
     private function _validateVerifyResponse($response)

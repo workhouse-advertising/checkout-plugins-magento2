@@ -101,7 +101,7 @@ class Purchase
                "firstName" => $quote->getCustomerFirstname() ? (string)$quote->getCustomerFirstname() : $billingAddress->getFirstname(),
                "lastName" => $quote->getCustomerLastname() ? (string)$quote->getCustomerLastname() : $billingAddress->getLastname(),
                "phone" => (string)$billingAddress->getTelephone(),
-               "email" => (string)$quote->getCustomerEmail(),
+               "email" => $this->_getEmail($quote),
             ],
 
             "shippingAddress" => $this->_getAddress($shippingAddress),
@@ -123,6 +123,23 @@ class Purchase
             "platformVersion" => $this->latitudeHelper->getPlatformVersion(),
             "pluginVersion" => $this->latitudeHelper->getVersion(),
         ];
+    }
+
+    private function _getEmail($quote)
+    {
+        if (!empty($quote->getCustomerEmail())) {
+            return (string)$quote->getCustomerEmail();
+        }
+
+        if (!empty($quote->getShippingAddress()->getEmail())) {
+            return (string)$quote->getShippingAddress()->getEmail();
+        }
+
+        if (!empty($quote->getBillingAddress()->getEmail())) {
+            return (string)$quote->getBillingAddress()->getEmail();
+        }
+
+        return "";
     }
 
     private function _getAddress($addr)
