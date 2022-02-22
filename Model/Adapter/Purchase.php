@@ -89,9 +89,8 @@ class Purchase
         $billingAddress = $quote->getBillingAddress();
         $shippingAddress = $quote->getShippingAddress();
 
-        return [
+        $purchaseRequest = [
             "merchantId" => $paymentGatewayConfig[LatitudeHelper::MERCHANT_ID],
-            "storeMid" => $paymentGatewayConfig[LatitudeHelper::STORE_MERCHANT_ID],
             "isTest" =>  $paymentGatewayConfig[LatitudeHelper::TEST_MODE],
             "merchantReference" => isset($quoteId) ? $quoteId : $quote->getIncrementId(),
             "amount" => $this->latitudeConvert->toPrice($quote->getGrandTotal()),
@@ -123,6 +122,14 @@ class Purchase
             "platformVersion" => $this->latitudeHelper->getPlatformVersion(),
             "pluginVersion" => $this->latitudeHelper->getVersion(),
         ];
+
+        // Adding the `storeMid` parameter if the current store configuration has a value for it.
+        $storeMid = $paymentGatewayConfig[LatitudeHelper::STORE_MERCHANT_ID] ?? null;
+        if ($storeMid) {
+            $purchaseRequest['storeMid'] = $paymentGatewayConfig[LatitudeHelper::STORE_MERCHANT_ID];
+        }
+
+        return $purchaseRequest;
     }
 
     private function _getEmail($quote)
